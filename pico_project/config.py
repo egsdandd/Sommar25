@@ -1,0 +1,5 @@
+ssid = "WaspEnterprice"
+password = "112233445566"
+mqtt_user = "iotuser"
+mqtt_password = "no22unix"
+mqtt_server = "10.0.1.254"
