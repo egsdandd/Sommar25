@@ -89,7 +89,7 @@ def outlier_Deleter(value_Array):
     return filtered_array
 
 def moisture_Precent(curr_Val):  
-    dry_Soil_Value = 65535 # Max value, The high seas 
+    dry_Soil_Value = 65535 # Max value, Wet soil
     wet_Soil_Value = 0 # Min value, Desert 
     percent = (curr_Val - dry_Soil_Value) * (100) / (wet_Soil_Value - dry_Soil_Value)
     return round(percent, 2)
