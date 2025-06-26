@@ -15,7 +15,10 @@ Log("Initializing onboard LED", "INFO")
 led = Pin("LED", Pin.OUT)  # Alarm pin for external alarm - Inbyggd LED på Pico W
 
 Log("Initializing DHT11 pin 11 for temp/hum", "INFO")
-dht_sensor = dht.DHT11(Pin(11))  # DHT22 sensor on GPIO 14
+dht_sensor = dht.DHT11(Pin(11))  # DHT11 sensor on GPIO 15
+
+Log("Initializing VCC buzzer pin 5", "INFO")
+buzzerVCC = Pin(5, Pin.OUT)  # VCC for buzzer
 
 Log("Initializing VCC soil pin 15", "INFO")
 sensorVCC = Pin(15, Pin.OUT)  # VCC for soilsensor
@@ -118,7 +121,7 @@ def plant_Monitor (plantVCC,sensorArray):
     sampleSize = 5
     moistureData = []
     return_Array = []
-    for _ in range (sampleSize): #As the mesurmement of soil is noizy I collect 50 moisture value per plant
+    for _ in range (sampleSize): #As the mesurmement of soil is noizy I collect 5 moisture value per plant
         plant_moist_Value = read_Sensor_Average(sampleSize,sensorArray, plantVCC) # Collect moisture value
         moistureData.append(plant_moist_Value)
     

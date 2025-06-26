@@ -27,18 +27,15 @@ This tutorial walks through the steps of making a simple IoT-device that can mon
     - [Step 2: update/install the firmware on your Pico](#step-2-updateinstall-the-firmware-on-your-pico)
     - [Step 3: uploading the code to the Pico](#step-3-uploading-the-code-to-the-pico)
 - [Putting everything together](#putting-everything-together)
-  - [The sunshine sensor](#the-sunshine-sensor)
-    - [Connecting it to the Pico](#connecting-it-to-the-pico)
+    - [The soil hygrometer](#the-soil-hygrometer)
     - [The temperature & humidity sensor](#the-temperature--humidity-sensor)
+    - [The internal temperature sensor](#the-internal-temperature-sensor)
     - [The buzzer (optional)](#the-buzzer-optional)
 - [Platform](#platform)
 - [The code](#the-code)
 - [Transmitting the data / connectivity](#transmitting-the-data--connectivity)
 - [Presenting the data](#presenting-the-data)
 - [Finalizing the design](#finalizing-the-design)
-- [How the sunshine sensor works](#how-the-sunshine-sensor-works)
-  - [In the dark](#in-the-dark)
-  - [In sunshine](#in-sunshine)
 - [Acknowledgements](#acknowledgements)
 - [License](#license)
 - [Disclaimer](#disclaimer)
@@ -65,11 +62,10 @@ Hopefully this data helps me understand how much water my plants get and adjust 
 | Name                                         | Picture                                                                              | Where to buy                                                                | Amount | Price (as of 2024-06-25) | Used for                                                                      | Note                                                                                                              |
 | -------------------------------------------- | ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------- | ------ | ------------------------ | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
 | Raspberry Pi Pico W                          | ![](https://www.electrokit.com/cache/c4/700x700-product_41019_41019110_41019110.jpg) | [Link](https://www.electrokit.com/en/raspberry-pi-pico-w)                   | 1 pcs  | 89 SEK                   | Microcontroller who runs the code. Has built in WIFI and Bluetooth            | You can use another micro controller if you want to. But I can't promise the rest of this tutorial will help you. |
-| Raspberry Pi Pico W                          | ![](https://www.electrokit.com/cache/c4/700x700-product_41019_41019110_41019110.jpg) | [Link](https://www.electrokit.com/en/raspberry-pi-pico-w)                   | 1 pcs  | 89 SEK                   | Microcontroller who runs the code. Has built in WIFI and Bluetooth            | You can use another micro controller if you want to. But I can't promise the rest of this tutorial will help you. |
+| Soil hygrometer module                       | ![](https://www.electrokit.com/upload/product/41015/41015738/41015738.jpg)           | [Link](https://www.electrokit.com/en/jordfuktighetssensor)                   | 2 pcs  | 29 SEK                   | Sensor for measuring the moisture level in soil           | You can use another sensor if you want to. But that might require changes in the code. |
 | Digital temperature and humidity sensor DHT11 | ![](https://www.electrokit.com/upload/product/41015/41015728/41015728.jpg)           | [Link](https://www.electrokit.com/digital-temperatur-och-fuktsensor-dht11)  | 1 pcs  | 49 SEK                   | Self-explanatory                                                              |                                                                                                                                        |
 | LED 3mm red low current 2mA TLLR4401         | ![](https://www.electrokit.com/cache/9e/700x700-product_40300_40300061_40300061.jpg) | [Link](https://www.electrokit.com/led-3mm-rod-lagstrom-2ma-tllr4401)        | 1 pcs  | 9 SEK                    | Used as an indicator                                                          |                                                                                                                   |
-| 0.47 kohm resistor                           | ![](https://www.electrokit.com/cache/98/700x700-product_41011_41011678_41011678.png) | [Link](https://www.electrokit.com/motstand-2w-4.7kohm-54k7)                 | 2 pcs  | 3 SEK                    |                                                                               | Any 4.7 kohm resistor works                                                                                       |
-| 94 kohm resistor                             | ![](https://www.electrokit.com/upload/product/41015/41015998/41015998.png)           | [Link](https://www.electrokit.com/motstand-metallfilm-0.125w-1100kohm-100k) | 1 pcs  | 3 SEK                    |                                                                               | The key here is that 94 is much much bigger than 0.47. Any resistor much larger than 0.47 works.                  |
+| 330 ohm resistor                           | ![](https://www.electrokit.com/upload/product/40812/40812018/40812018.png) | [Link](https://www.electrokit.com/en/motstand-1w-5330ohm-330r7)                 | 1 pcs  | 3 SEK                    |                                                                               | Any 330ohm resistor works                                                                                       |
 | Wires male-to-male                           | ![](https://www.electrokit.com/upload/product/41015/41015221/41015221.jpg)           | [Link](https://www.electrokit.com/labbsladdar-100mm-hane/hane-30-pack)      | 30 pcs | 39 SEK                   |                                                                               | Your layout on the breadboard is up to you. But you will probably not need more than 30 wires                     |
 | Breadboard                                   | ![](https://www.electrokit.com/upload/product/10160/10160840/10160840.jpg)           | [Link](https://www.electrokit.com/kopplingsdack-840-anslutningar)           | 1 pcs  |    69 SEK                      | For connecting everything                                                     | What I recommend. Should be plenty of room.                                                                       |
 | Buzzer **(optional)**                        | ![](https://www.electrokit.com/upload/product/41003/41003599/41003599.jpg)           | [Link](https://www.electrokit.com/summer-4-khz-miniatyr)                    | 1 pcs  |  28.45 SEK                        | Used as an indicator                                                          | An extra sound indicator.                                                                                         |
@@ -99,7 +95,7 @@ The Pico W is the heart of the IoT-device and runs all the code and also sends t
 ### Step 1: VS Code
 
 * Got the official [download page](https://code.visualstudio.com/) for VS code and download the version for your specific OS . Run the downloaded file and follow the steps in the installer.
-* The write the code to the Pico we are going to use an extension in VS Code that is called *PyMakr*. Go to the extensions tab in VS Code and search for *PyMakr* and install the first extension that shows up in the results.
+* To write the code to the Pico we are going to use an extension in VS Code that is called *MicroPico*. Go to the extensions tab in VS Code and search for *MicroPico* and install the first extension that shows up in the results.
 
 ### Step 2: update/install the firmware on your Pico
 
@@ -110,22 +106,31 @@ We are now going to install the right firmware to the Pico so we can program it 
 3. Drag and drop the *.uf2* file you downloaded previously to the Pico. When the file is transferred the Pico will automatically disconnect itself.
 
 > [!Important]
-> If everything went well the Pico should automatically disconnect itself from the computer! If it did not, somethings wrong and you will have to repeat the steps above.
+> If everything went well the Pico should automatically disconnect itself from the computer! If it did not, somethings went wrong and you will have to repeat the steps above. 
+Press the SHIFT-CTRL-P and search for MicroPico connect. Click on it and you should se a text in the lower left corner in VSC that the device is connected. Study the options to the right of the connection message.
 
 ### Step 3: uploading the code to the Pico
-Well done! We are now ready to upload the code to the Pico. I recommend you to play around a  with your Pico and try to write your own code and upload it. [This](https://www.youtube.com/watch?v=e-Fs2vhL1l8) video goes through an example on how to write and upload code to your Pico using the PyMakr extension.
+Well done! We are now ready to upload the code to the Pico. I recommend you to play around with your Pico and try to write your own code and upload it. Then download the code with the MicroPico extension.
 
-When you are feeling confident in writing code to the Pico, clone this GitHub repository to your computer and open the folder in VS Code.
+When you are feeling confident in writing code to the Pico, clone the GitHub repository to your computer and open the folder in VS Code.
 
 #### Variables in the code
 
-Before writing my code to your Pico you are going to need to change some variables. In the [*main.py*](https://github.com/pajserman/IoT-plants/blob/master/main.py) file, under "MQTT variables", change the variable *MQTT_BROKER* to the IP address of the computer that hosts/will host your MQTT broker on your network.
+Before writing the code to your Pico you are going to need to change some variables. In the *config.py* file, under fill out yor information:
 
-The Pico is going to be connect to your WIFI. Open the file *keys.py.example* and enter the name and the password to your WIFI. Then save the file as *keys.py* (remove .example at the end) in the same location.
+ssid = "MyWifiNetwork"
+password = "MyWifiPassword"
+mqtt_user = "mqttuser"
+mqtt_password = "mqttpassword"
+mqtt_server = "mqtt_server_ip"
+
+The *ssid* and *password* variables are the name and password of your WIFI network. The *mqtt_user* and *mqtt_password* are the username and password for your MQTT broker. The *mqtt_server* is the IP address of your MQTT broker. If you are using a Raspberry Pi, this is probably the IP address of your Raspberry Pi.
+
+The Pico is going to be connect to your WIFI and MQTT broker.
 
 You are also free to change the mapping of the pins if you want to. But in the rest of the tutorial, I am going to assume you do not.
 
-When everything set you are free to upload the code to the Pico.
+When everything set you are good to upload the code to the Pico.
 
 > [!TIP]
 > I have programmed the built in LED on the Pico as an indicator:
@@ -138,29 +143,18 @@ When everything set you are free to upload the code to the Pico.
 
 # Putting everything together
 
-The whole device can be split in 4 parts: The **Pico**, the **sunshine sensor**, the **temperature and humidity sensor** and the **buzzer**. I am not going to provide a diagram that shows you exactly where to put things on the breadboard; as it would be too messy. Everything except the sunshine detector is as straight forward as just connecting the device directly to the Pico.
+The whole device can be split in 4 parts: The **Pico**, the **soil hygrometer**, the **temperature and humidity sensor** and the **buzzer**. I am not going to provide a diagram that shows you exactly where to put things on the breadboard; as it would be too messy. Everything except the sunshine detector is as straight forward as just connecting the device directly to the Pico.
 
 > [!CAUTION]
 > Always disconnect the power supply when connecting the electronics together! Sudden changes in voltage and current can damage the components!
 
-### The sunshine sensor
+### The soil hygrometer
 
-This sensor works as a standalone part and can be built without the Pico. Down below is the circuit diagram for the sensor. The LED is used as an indicator: when the LED is **off** it means it’s too bright. You can tune the sensor with the potentiometer. A more in depth explanation on [How the sunshine sensor](https://github.com/pajserman/IoT-plants/tree/master?tab=readme-ov-file#how-the-sunshine-sensor-works) works can be found at the end of this tutorial.
-
-![figure2](https://github.com/pajserman/IoT-plants/blob/master/images/figure2.svg)
-*Figure 2: Diagram for the sunshine sensor*
-
-> [!TIP]
-> You can use the built in 3.3 V power supply from the Pico when building the sunshine sensor.
-
-> [!IMPORTANT]
-> The tuning of the sensor only gets you that far. The sensor is designed for sensing the difference between normal daylight and very bright sunlight. If you want to change the range, for example use it as a day/night sensor; switch the 470 ohm resistor (above the potentiometer) for a higher value resistor around 5 kohm.
-
-#### Connecting it to the Pico
-
-* Connect the ground in the diagram to one of the ground pins on the Pico (all grounds can share the same pin).
-* Connect the Vcc supply to the built in 3.3 V power supply on the Pico (same here, both Vcc can share the same pin)
-* Connect the node marked Vs in the diagram to **Pin 15** on the Pico.
+The soil hygrometer is a simple sensor that measures the moisture level in the soil. It has two pins: GROUND and SIGNAL. The sensor is connected to a small printed circuit board (PCB) with 4 pins (we are only using the GROUND, VCC and SIGNAL pins) that connects to the Pico as follows:
+* Connect the VCC pins to the Picos **GP15** .
+* Connect the GROUND pins to one of the Picos ground pins.
+* Connect the SIGNAL pins to **Pin 28/27** on the Pico.
+* The sensor is powered by the Pico, so you do not need to connect the power pin to anything.
 
 ### The temperature & humidity sensor
 
@@ -168,7 +162,11 @@ This one is very straight forward. The DHT11 sensor has 3 pins: GROUND, POWER an
 
 * Connect GROUND pin to one of the Picos ground pins.
 * The POWER pin to the Picos 3.3 V power supply.
-* The SIGNAL pin to **Pin 27** on the Pico.
+* The SIGNAL pin to **GP 11** on the Pico.
+
+### The internal temperature sensor
+
+The internal temperature sensor (ADC4) is powered by the Pico, so you do not need to connect the power pin to anything.
 
 ### The buzzer (optional)
 
@@ -178,16 +176,17 @@ The buzzer generates a tone when the sunshine is too bright.
 * Connect the other to **Pin 5** on the Pico.
 
 If you do not want the buzzer, you can just skip this step.
+
 # Platform
 
-As mentioned before, the whole solution is self-hosted on a Raspberry Pi on my own network. Mostly because I care about privacy. I wanted to make it easy for myself and searched the web for a pre made [docker-compose](https://docs.docker.com/compose/) IoT-stack that can be used in my project. I stumbled upon [this](https://learnembeddedsystems.co.uk/easy-raspberry-pi-iot-server) tutorial which was exactly what I needed. The tutorial is using [this](https://github.com/SensorsIot/IOTstack) GitHub repository for installing the stack. The repository comes with a bash script that automatically builds the docker-compose yml file for you! The bash script also has options for backing up your data. Very easy to use!
+As mentioned before, the whole solution is self-hosted on a Raspberry Pi on my own network. Mostly because I care about privacy. I wanted to make it easy for myself and searched the web for a pre made [docker-compose](https://docs.docker.com/compose/) MQTT-brooker called Mosquitto that can be used in my project with Docker-Compose. There are many others to choose from and another example is [this](https://learnembeddedsystems.co.uk/easy-raspberry-pi-iot-server) tutorial which can be, if preferred:  The tutorial is using [this](https://github.com/SensorsIot/IOTstack) GitHub repository for installing the stack. The repository comes with a bash script that automatically builds the docker-compose yml file for you! The bash script also has options for backing up your data. Very easy to use!
 
 Following the tutorial, I installed the stack which consist of:
 
 * [Mosquitto](https://mosquitto.org/) (MQTT Broker)
 * [Node-red](https://nodered.org/) (programming tool for connecting devices. In this case the MQTT Broker with the Influx Database)
-* [InfluxDB](https://www.influxdata.com/) (Database)
-* [Grafana](https://grafana.com/) (For visualizing the data)
+* [InfluxDBMongoDB ](https://www.mongodb.com/) (Database)
+* [Node-red-desktop](https://nodered.org/)  (For visualizing the data I use rev 2.0.0 of the dashboard)
 
 > [!IMPORTANT]
 > You are going to need to set up a static IP address for your Raspberry Pi in your WIFI router. The process is different depending on what brand your router is. Search the web for your router brand and how to set up a static IP address.
@@ -197,7 +196,7 @@ Following the tutorial, I installed the stack which consist of:
 
 # The code
 
-The code on the Pico is very simple. Half of the lines in the [*main.py*](https://github.com/pajserman/IoT-plants/blob/master/main.py) file is mostly importing libraries and setting up constants. The reason the code is so small is because of the extensive use of libraries. The DHT11 library (which comes with MicroPython) makes the collecting of the data from the DHT11 sensor as easy as just running a function - no need for setting up communications with the sensor yourself. The *umqttsimple* library, found in the [*lib*](https://github.com/pajserman/IoT-plants/tree/master/lib) folder, manages all the communication with the MQTT protocol.
+The code on the Pico is very simple. Half of the lines in the [*main.py*] file is mostly importing libraries and setting up constants. The reason the code is so small is because of the extensive use of libraries. The DHT11 library (which comes with MicroPython) makes the collecting of the data from the DHT11 sensor as easy as just running a function - no need for setting up communications with the sensor yourself. The *umqttsimple* library, found in the [*umqtt*] folder, manages all the communication with the MQTT protocol. To set up WiFi/MQtt and the loggingfunctionality I used the [*network*](https://docs.micropython.org/en/latest/library/network.html) and [*logging*](https://docs.micropython.org/en/latest/library/logging.html) libraries that come with MicroPython. The code is written in a way that it can be easily extended to include more sensors or features.
 
 I would describe the code as consisting of 3 main functions/sections:
 
@@ -240,20 +239,11 @@ while (True):
         time.sleep(5)
 ```
 
-
-I also want to add a small note on the `gather_data()` function. If you studied the [circuit diagram](https://github.com/pajserman/IoT-plants/tree/master?tab=readme-ov-file#the-sunshine-sensor) of the sunshine sensor you might realize the output *Vs* is the opposite of the LED indicator. I of course want them to be the same (LED on = True/1). That is why I invert the input in the code:
-
-`sun = (lightPin.value() + 1) % 2 #inverting input 1 becomes 0`
 # Transmitting the data / connectivity
 
 Down below is a graph that describes how the whole project is connected together. The data from the DHT11 sensor is sent over a proprietary protocol managed by the DHT11 library using a physical wire. The sunshine sensor is just a simple HIGH or LOW voltage. The Pico sends the environment data every 5 seconds over WIFI using the MQTT protocol to the router. The router forwards the message to the Raspberry Pi where the Mosquito MQTT broker listens on that port. The data then takes two paths:
 
-Node-red, which is on the same network (as in an internal docker network) as the mosquitto broker, pushes the data to the Influx Database. Grafana which can be accessed on the local network has access to the Influx Database.
-
-The other path goes through a very [simple API](https://github.com/pajserman/IoT-plants/tree/master/other/backend) that I wrote myself that just forwards the data under the topic *Pico/sensor* from the MQTT broker. This API is open to the internet. In this way I can check my plants environment in real time anywhere on earth without having to expose the MQTT broker or Grafana to the internet. The whole reason for hosting everything myself was due to privacy, remember? I might want to use the MQTT broker and Grafana for other projects in the future and I do not want that data to be public.
-
-![figure3](https://github.com/pajserman/IoT-plants/blob/master/images/figure3.svg)
-*Figure 3: How the whole solution is connected*
+Node-red, which is on the same network (as in an internal docker network) as the mosquitto broker, pushes the data to the MongoDB Database. Grafana which can be accessed on the local network has access to the Influx Database.
 
 # Presenting the data
 
