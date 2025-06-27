@@ -44,7 +44,7 @@ This tutorial walks through the steps of making a simple IoT-device that can mon
 
 The inspiration for this project came to me as a result of spending most of my summer at our summer house and then leaving our home unattended. I do have a watering system in place that runs on a schedule and I am also monitoring the waterflow in case ther should be a problem with the piping. However living in Sweden close to the coast you can never predict how much rain that will fall locally. I then decided to measure the humidity around the plants and based on that change the watering schedule. I also included a device to measure the air temperature and humidity and also the actual temperature of the device.
 
-![figure1](https://github.com/pajserman/IoT-plants/blob/master/images/figure1.jpg)
+![figure1](https://github.com/egsdandd/Sommar25/blob/main/img/utebild.jpg)
 *Figure 1: The outdoor plants*
 
 Hopefully this data helps me understand how much water my plants get and adjust the watering schedule accordingly. I also wanted to make a device that is easy to build and can be used in other projects. The device is built around a Raspberry Pi Pico W microcontroller which has built in WIFI and Bluetooth. The code is written in MicroPython and the data is sent over MQTT to a self-hosted MQTT broker on my home network. The data is then stored in an MongoDB database and visualized with Node-RED.
