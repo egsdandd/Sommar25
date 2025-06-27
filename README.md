@@ -179,17 +179,17 @@ If you do not want the buzzer, you can just skip this step.
 
 # Platform
 
-As mentioned before, the whole solution is self-hosted on a Raspberry Pi on my own network. Mostly because I care about privacy. I wanted to make it easy for myself and searched the web for a pre made [docker-compose](https://docs.docker.com/compose/) MQTT-brooker called Mosquitto that can be used in my project with Docker-Compose. There are many others to choose from and another example is [this](https://learnembeddedsystems.co.uk/easy-raspberry-pi-iot-server) tutorial which can be, if preferred:  The tutorial is using [this](https://github.com/SensorsIot/IOTstack) GitHub repository for installing the stack. The repository comes with a bash script that automatically builds the docker-compose yml file for you! The bash script also has options for backing up your data. Very easy to use!
+As mentioned before, the whole solution is self-hosted on a Raspberry Pi on my own network. Mostly because I care about privacy. I wanted to make it easy for myself and searched the web for a pre made [docker-compose](https://docs.docker.com/compose/) MQTT-brooker called Mosquitto that can be used in my project with Docker-Compose. There are many others to choose from and another example is [this](https://learnembeddedsystems.co.uk/easy-raspberry-pi-iot-server) tutorial which can be, if preferred:  The tutorial is using [this](https://github.com/SensorsIot/IOTstack) GitHub repository for installing the stack. The repository comes with a bash script that automatically builds the docker-compose yml file for you! The bash script also has options for backing up your data.
 
-Following the tutorial, I installed the stack which consist of:
+I choosed to install my own on my Raspberry Pi as it is good learning experience. The stack consist of:
 
-* [Mosquitto](https://mosquitto.org/) (MQTT Broker)
-* [Node-red](https://nodered.org/) (programming tool for connecting devices. In this case the MQTT Broker with the Influx Database)
-* [InfluxDBMongoDB ](https://www.mongodb.com/) (Database)
+* [Mosquitto](https://mosquitto.org/) (Docker based MQTT Broker)
+* [MongoDB ](https://www.mongodb.com/) (Docker based Database)
+* [Node-red](https://nodered.org/) (programming tool for connecting devices. In this case the MQTT Broker with the MongoDB Database). This I installed plain even though it is available as a docker image.
 * [Node-red-desktop](https://nodered.org/)  (For visualizing the data I use rev 2.0.0 of the dashboard)
 
 > [!IMPORTANT]
-> You are going to need to set up a static IP address for your Raspberry Pi in your WIFI router. The process is different depending on what brand your router is. Search the web for your router brand and how to set up a static IP address.
+> You are going to need to assign a static IP address for your Raspberry Pi in your WIFI router. The process is different depending on what brand your router is. Search the web for your router brand and how to set up a static IP address.
 
 > [!TIP]
 > I have hosted a lot of stuff on different Raspberrys before and have the infrastructure already set up. If it is your first time, I recommend watching a tutorial on how to set up a Raspberry with a simple web server. And maybe also on how to use docker-compose. Here is a good [video](https://www.youtube.com/watch?v=jLff_K39qL4) for getting started with a fresh Raspberry Pi.
@@ -208,35 +208,38 @@ Down below is the main loop that runs indefinitely. I think the code is pretty s
 
 ```Python
 # THE MAIN LOOP
-while (True):
-    try:
-        while (wlan.isconnected() == True):
-            try:
-                data = gather_data()  # data {temp, hum, sun}
-                print(data)
-            except:
-                collecting += 1
-                mqtt_client.publish(MQTT_TOPIC_ERROR_COLLECTING, str(collecting))
-                print("Something went wrong in collecting data sleeping 5 ...")
-                time.sleep(5)
-            # sounding alarm if sun is too intense
-            if (data['sunshine'] == 0):
-                buzzer.duty_u16(1000)
-            else:
-                buzzer.duty_u16(0)
-            # publish data
-            led.toggle()
-            json_string = json.dumps(data)
-            mqtt_client.publish(MQTT_TOPIC_SENSOR, json_string)
-            led.toggle()
-            time.sleep(5)
-        else:
-            connect_to_wifi()
-    except:
-        other += 1
-        mqtt_client.publish(MQTT_TOPIC_ERROR_OTHER, str(other))
-        print("Something went wrong in collecting data sleeping 5 ...")
-        time.sleep(5)
+    while True:
+        try:
+            ADC_temperature, ADC_calibrated_temperature, ADC_voltage = read_calibrated_temperature()
+
+            temperature, humidity = read_DHT22()
+
+            moist = plant_Monitor(sensorVCC,[soil_Sensor1,soil_Sensor2]) 
+            plant_Left_Moist_Level = moist[0]
+            plant_Right_Moist_Level = moist[1]
+
+            print("Plant Left Moisture Level:", plant_Left_Moist_Level, "%")
+            print("Plant Right Moisture Level:", plant_Right_Moist_Level, "%")
+            plants =[
+                ["left",plant_Right_Moist_Level,50],
+                ["right",plant_Left_Moist_Level,50]
+            ] 
+        except Exception as e:
+            print("Sensor read failed:", e)
+            time.sleep(300)
+            continue
+        try:
+            FlashLed(2)  # Flash LED to indicate data read
+
+            client.publish("egsdand/feeds/picow_temp", str(temperature))
+            client.publish("egsdand/feeds/picow_hum", str(humidity))
+            client.publish("egsdand/feeds/moisture1", str(plant_Left_Moist_Level))
+            client.publish("egsdand/feeds/moisture2", str(plant_Right_Moist_Level))
+            client.publish("egsdand/feeds/adc_calibrated_temp", str(ADC_calibrated_temperature))
+            print("Data published successfully")
+        except Exception as e:
+            print("Publish failed:", e)
+        time.sleep(10)
 ```
 
 # Transmitting the data / connectivity

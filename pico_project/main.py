@@ -63,32 +63,38 @@ Log("Starting up...", "INFO")
 # Flash LED to indicate startup
 FlashLed(1)
 
-# Huvudfunktion för att läsa sensordata och skicka till MQTT
-
 # DHT22-sensor
 def read_DHT22():
-    dht_sensor.measure()
-    temperature = dht_sensor.temperature()
-    humidity = dht_sensor.humidity()
-    print("Temperature:", temperature, "°C, Humidity:", humidity, "%")
+    dht_sensor.measure() # Measure temperature and humidity
+    # Wait for sensor to stabilize
+    time.sleep(2)  # DHT22 needs a few seconds to stabilize after power
+    temperature = dht_sensor.temperature() # Get temperature in Celsius
+    if (temperature is None):
+        Log("Failed to read temperature from DHT22", "ERROR")
+        return None, None
+    humidity = dht_sensor.humidity() # Get humidity in percentage
+    if (humidity is None):
+        Log("Failed to read humidity from DHT22", "ERROR")
+        return None, None
+    # print("Temperature:", temperature, "°C, Humidity:", humidity, "%")
     return temperature, humidity
 
 def outlier_Deleter(value_Array):
-    value_Array = sorted(value_Array)
-    n = len(value_Array)
-    q1_Pos = (n + 1) / 4
-    q3_Pos = 3 * (n + 1) / 4
+    value_Array = sorted(value_Array) # Sort the array to calculate quartiles
+    n = len(value_Array) # Number of values in the array
+    q1_Pos = (n + 1) / 4 # Quartile 1 position
+    q3_Pos = 3 * (n + 1) / 4 # Quartile 3 position
     # This function is used to calculate the quartile values
     def qurtile_calc(pos):
-        lower = value_Array[int(pos)-1]
-        upper = value_Array[int(pos)]
-        return lower + (pos%1)*(upper - lower)
+        lower = value_Array[int(pos)-1] # Lower value of the quartile
+        upper = value_Array[int(pos)] # Upper value of the quartile
+        return lower + (pos%1)*(upper - lower) # Interpolate between lower and upper value
     q1 = qurtile_calc(q1_Pos) # quartile 1
-    q3 = qurtile_calc(q3_Pos)# quartile 1
+    q3 = qurtile_calc(q3_Pos)# quartile 3
     iqr = q3-q1# inter quartile range
-    lower_Bound = q1 - (1.5*iqr)
-    upper_Bound = q3 + (1.5*iqr)
-    filtered_array = list(filter(lambda x:lower_Bound<=x<=upper_Bound,value_Array))
+    lower_Bound = q1 - (1.5*iqr) # Lower bound for outliers
+    upper_Bound = q3 + (1.5*iqr) # Upper bound for outliers
+    filtered_array = list(filter(lambda x:lower_Bound<=x<=upper_Bound,value_Array)) # Filter the array to remove outliers
     return filtered_array
 
 def moisture_Precent(curr_Val):  
@@ -118,9 +124,9 @@ def read_Sensor_Average(samples, plant_Reader, plantVCC):
     return return_Array
 
 def plant_Monitor (plantVCC,sensorArray):
-    sampleSize = 5
-    moistureData = []
-    return_Array = []
+    sampleSize = 5 # Number of samples to take for each plant
+    moistureData = [] # Array to hold moisture values for each plant
+    return_Array = [] # Array to hold the final moisture levels for each plant
     for _ in range (sampleSize): #As the mesurmement of soil is noizy I collect 5 moisture value per plant
         plant_moist_Value = read_Sensor_Average(sampleSize,sensorArray, plantVCC) # Collect moisture value
         moistureData.append(plant_moist_Value)
@@ -133,7 +139,7 @@ def plant_Monitor (plantVCC,sensorArray):
     return return_Array
 
 def main():
-     # Sätt loggnivå (kan ändras här)
+     # Define log level
     currentLogLevel = logLevels["INFO"]
     
     Log("Starting up...", "INFO")
@@ -146,7 +152,6 @@ def main():
 
             temperature, humidity = read_DHT22()
 
-            print("SensorVCC state:", sensorVCC.value() )
             moist = plant_Monitor(sensorVCC,[soil_Sensor1,soil_Sensor2]) 
             plant_Left_Moist_Level = moist[0]
             plant_Right_Moist_Level = moist[1]
@@ -157,14 +162,13 @@ def main():
                 ["left",plant_Right_Moist_Level,50],
                 ["right",plant_Left_Moist_Level,50]
             ]
-            print("Plants:", plants)
-            #Log(f"Temperature: {temperature}°C, Humidity: {humidity}%, ADC Temperature: {ADC_temperature}°C, Moisture Left: {plant_Left_Moist_Level}%, Moisture Right: {plant_Right_Moist_Level}%", "DEBUG")    
+            # print("Plants:", plants)  
         except Exception as e:
             print("Sensor read failed:", e)
             time.sleep(300)
             continue
         try:
-            FlashLed(1)  # Flash LED to indicate data read
+            FlashLed(2)  # Flash LED to indicate data read
             # Publish data to MQTT broker
             client.publish("egsdand/feeds/picow_temp", str(temperature))
             client.publish("egsdand/feeds/picow_hum", str(humidity))

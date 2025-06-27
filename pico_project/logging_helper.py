@@ -14,7 +14,7 @@ logLevels = {
     "SCREEN": 60,
 }
 
-currentLogLevel = logLevels["DEBUG"]  # Byt till "SCREEN" för att skriva till skärm
+currentLogLevel = logLevels["INFO"]  # Byt till "SCREEN" för att skriva till skärm
 
 def Log(message, level="INFO"):
     if logLevels[level] >= currentLogLevel:
