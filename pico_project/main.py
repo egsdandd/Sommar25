@@ -134,7 +134,7 @@ def plant_Monitor (plantVCC,sensorArray):
 
 def main():
      # Sätt loggnivå (kan ändras här)
-    currentLogLevel = logLevels["SCREEN"]
+    currentLogLevel = logLevels["INFO"]
     
     Log("Starting up...", "INFO")
     client = connect_mqtt()
@@ -158,7 +158,7 @@ def main():
                 ["right",plant_Left_Moist_Level,50]
             ]
             print("Plants:", plants)
-            Log(f"Temperature: {temperature}°C, Humidity: {humidity}%, ADC Temperature: {ADC_temperature}°C, Moisture Left: {plant_Left_Moist_Level}%, Moisture Right: {plant_Right_Moist_Level}%", "DEBUG")    
+            #Log(f"Temperature: {temperature}°C, Humidity: {humidity}%, ADC Temperature: {ADC_temperature}°C, Moisture Left: {plant_Left_Moist_Level}%, Moisture Right: {plant_Right_Moist_Level}%", "DEBUG")    
         except Exception as e:
             print("Sensor read failed:", e)
             time.sleep(300)
