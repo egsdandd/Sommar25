@@ -168,12 +168,12 @@ def main():
             # Publish data to MQTT broker
             client.publish("egsdand/feeds/picow_temp", str(temperature))
             client.publish("egsdand/feeds/picow_hum", str(humidity))
-            client.publish("egsdand/feeds/adc_temp", str(ADC_temperature))
+            # client.publish("egsdand/feeds/adc_temp", str(ADC_temperature))
             client.publish("egsdand/feeds/moisture1", str(plant_Left_Moist_Level))
             client.publish("egsdand/feeds/moisture2", str(plant_Right_Moist_Level))
-            client.publish("egsdand/feeds/plants", str(plants))
+            # client.publish("egsdand/feeds/plants", str(plants))
             client.publish("egsdand/feeds/adc_calibrated_temp", str(ADC_calibrated_temperature))
-            client.publish("egsdand/feeds/adc_voltage", str(ADC_voltage))
+            # client.publish("egsdand/feeds/adc_voltage", str(ADC_voltage))
             print("Data published successfully")
         except Exception as e:
             print("Publish failed:", e)
