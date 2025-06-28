@@ -4,6 +4,9 @@
 
 **Time to complete build**: 3-5 days
 
+> [!NOTE]
+> A lot of the text is copied from one of last years (2024) students who did something wery similar to my project. I have updated the sections that differs but he should have all the credits for doing the time consuming work with the tabel of components and materials used in the project and for most of the backgrund information. My project can be found [here](
+
 This tutorial walks through the steps of making a simple IoT-device that can monitor temperature and humidity of the environment around your plants. This tutorial was made as an assignment to a [IoT-course](https://lnu.se/en/course/introduction-to-applied-internet-of-things/distance-international-summer/) at Linnaeus University. The project takes about 5 days to build and maybe 2 extra for setting up the digital infrastructure. It all depends on how comfortable you are with programming and if you have self-hosted services before.
 
 > [!IMPORTANT]
@@ -201,7 +204,7 @@ The code on the Pico is very simple. Half of the lines in the [*main.py*] file i
 I would describe the code as consisting of 3 main functions/sections:
 
 - the `connect_to_wifi()` function
-- the `gather_data()` function
+- the `connect_to_mqtt()` function
 - and the *main while loop*
 
 Down below is the main loop that runs indefinitely. I think the code is pretty straight forward, so I will not go through it step by step. But I am going to make some small remarks. I made sure that the code does not crash or halt if anything goes wrong. Notice the extensive use of try-catch blocks. If the device loses WIFI connecting it will enter another loop in the `connect_to_wifi()` function that tries to connect to the WIFI every 10 seconds. If the `gather_data()` function fails, maybe due to a sensor being disconnected, the code prints an error message and sends a message to the MQTT topic */collecting* or */other* - depending on if the error occurred collecting data or because of something else.
