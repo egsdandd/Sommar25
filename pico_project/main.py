@@ -7,7 +7,7 @@ from mqtt_helper import connect_mqtt
 from logging_helper import Log, currentLogLevel, logLevels  # Importera loggningsfunktionen
 import time
 import dht
-from machine import Pin, ADC
+from machine import Pin, ADC, PWM
 import gc
 
 # Pin layout:
@@ -18,8 +18,8 @@ Log("Initializing DHT11 pin 11 for temp/hum", "INFO")
 dht_sensor = dht.DHT11(Pin(11))  # DHT11 sensor on GPIO 15
 
 Log("Initializing VCC buzzer pin 5", "INFO")
-buzzerVCC = Pin(5, Pin.OUT)  # VCC for buzzer
-
+buzzerVCC = PWM(Pin(5))  # VCC for buzzer
+buzzerVCC.freq(440)  # Set frequency to 1kHz
 Log("Initializing VCC soil pin 15", "INFO")
 sensorVCC = Pin(15, Pin.OUT)  # VCC for soilsensor
 
@@ -58,11 +58,24 @@ def FlashLed(noOfTimes):
         time.sleep(1)
     time.sleep(1)
 
+# Buzzer function to beep a specified number of times
+# This function will turn on the buzzer for 1 second, then off for 1 second, repeating for the specified number of times.
+# It is used to indicate startup or other events.        
+def Buzzer(noOfTimes):
+    print("Beeping", noOfTimes, "times")
+    buzzerVCC.duty_u16(0) # Make sure buzzer is off
+    for i in range(noOfTimes,0,-1): 
+        buzzerVCC.duty_u16(32768)  # Set duty cycle to 50% (32768 out of 65535)
+        time.sleep(1)
+        buzzerVCC.duty_u16(0) # Set duty cycle to 0% (off)
+        time.sleep(1)
+    time.sleep(1)
+
 # Flash led to indicate startup
 Log("Starting up...", "INFO")
 # Flash LED to indicate startup
 FlashLed(1)
-
+Buzzer(1)
 # DHT22-sensor
 def read_DHT22():
     dht_sensor.measure() # Measure temperature and humidity
@@ -169,6 +182,7 @@ def main():
             continue
         try:
             FlashLed(2)  # Flash LED to indicate data read
+            Buzzer(1)
             # Publish data to MQTT broker
             client.publish("egsdand/feeds/picow_temp", str(temperature))
             client.publish("egsdand/feeds/picow_hum", str(humidity))
@@ -179,6 +193,7 @@ def main():
             client.publish("egsdand/feeds/adc_calibrated_temp", str(ADC_calibrated_temperature))
             # client.publish("egsdand/feeds/adc_voltage", str(ADC_voltage))
             print("Data published successfully")
+            # Buzzer(2)
         except Exception as e:
             print("Publish failed:", e)
         time.sleep(10)
