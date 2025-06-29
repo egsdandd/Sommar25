@@ -146,6 +146,9 @@ When everything set you are good to upload the code to the Pico.
 
 # Putting everything together
 
+![figure2](https://github.com/egsdandd/Sommar25/blob/main/img/ritning.jpg)
+*Figure 2: Connecting*
+
 The whole device can be split in 4 parts: The **Pico**, the **soil hygrometer**, the **temperature and humidity sensor** and the **buzzer**. I am not going to provide a diagram that shows you exactly where to put things on the breadboard; as it would be too messy. Everything except the sunshine detector is as straight forward as just connecting the device directly to the Pico.
 
 > [!CAUTION]

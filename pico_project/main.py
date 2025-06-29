@@ -182,7 +182,7 @@ def main():
             continue
         try:
             FlashLed(2)  # Flash LED to indicate data read
-            Buzzer(1)
+            #Buzzer(1)
             # Publish data to MQTT broker
             client.publish("egsdand/feeds/picow_temp", str(temperature))
             client.publish("egsdand/feeds/picow_hum", str(humidity))
