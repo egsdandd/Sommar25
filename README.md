@@ -55,7 +55,7 @@ Hopefully this data helps me understand how much water my plants get and adjust 
 # Material
 
 > [!NOTE]
-> A lot of the materials I used in the project I had laying around since before. I realize now that the project can be a bit expensive if you have to buy all of these things at once, especially the Raspberry Pi. Just note that the Raspberry can host a  lot of stuff and be used in multiple projects at once! You probably won't regret buying one!
+> The materials I used in the project is included in teh basic pack recomended for the course but i bougt the 2 soil sensors separatly. I realize now that the project can be a bit expensive if you have to buy all of these things at once, especially the Raspberry Pi. Just note that the Raspberry can host a  lot of stuff and be used in multiple projects at once! You probably won't regret buying one!
 
 > [!TIP]
 > A lot of the basic components such as LEDs and resistors are cheaper to buy in larger numbers. Might not hurt to order a few extra!
@@ -185,7 +185,9 @@ If you do not want the buzzer, you can just skip this step.
 
 # Platform
 
-As mentioned before, the whole solution is self-hosted on a Raspberry Pi on my own network. Mostly because I care about privacy. I wanted to make it easy for myself and searched the web for a pre made [docker-compose](https://docs.docker.com/compose/) MQTT-brooker called Mosquitto that can be used in my project with Docker-Compose. There are many others to choose from and another example is [this](https://learnembeddedsystems.co.uk/easy-raspberry-pi-iot-server) tutorial which can be, if preferred:  The tutorial is using [this](https://github.com/SensorsIot/IOTstack) GitHub repository for installing the stack. The repository comes with a bash script that automatically builds the docker-compose yml file for you! The bash script also has options for backing up your data.
+As mentioned before, the whole solution is self-hosted on a Raspberry Pi on my own network. Mostly because I care about privacy. I wanted to make it easy for myself and searched the web for a pre made [docker-compose](https://docs.docker.com/compose/) MQTT-brooker called Mosquitto that can be used in my project with Docker-Compose. 
+
+There are many others to choose from and another example is [this](https://learnembeddedsystems.co.uk/easy-raspberry-pi-iot-server) tutorial which can be, if preferred:  The tutorial is using [this](https://github.com/SensorsIot/IOTstack) GitHub repository for installing the stack. The repository comes with a bash script that automatically builds the docker-compose yml file for you! The bash script also has options for backing up your data.
 
 I choosed to install my own on my Raspberry Pi as it is good learning experience. The stack consist of:
 
@@ -250,66 +252,26 @@ Down below is the main loop that runs indefinitely. I think the code is pretty s
 
 # Transmitting the data / connectivity
 
-Down below is a graph that describes how the whole project is connected together. The data from the DHT11 sensor is sent over a proprietary protocol managed by the DHT11 library using a physical wire. The sunshine sensor is just a simple HIGH or LOW voltage. The Pico sends the environment data every 5 seconds over WIFI using the MQTT protocol to the router. The router forwards the message to the Raspberry Pi where the Mosquito MQTT broker listens on that port. The data then takes two paths:
+Down below is a graph that describes how the whole project is connected together. The data from the DHT11 sensor is sent over a proprietary protocol managed by the DHT11 library using a physical wire. The soil sensors works the same way. The Pico sends the environment data every 60 seconds over WIFI using the MQTT protocol to the brooker. The router forwards the message from the Pico to the Raspberry Pi where the Mosquito MQTT broker listens on that port. The data then takes this path:
 
-Node-red, which is on the same network (as in an internal docker network) as the mosquitto broker, pushes the data to the MongoDB Database. Grafana which can be accessed on the local network has access to the Influx Database.
+Sensors --> Pico --> MQTT-broker hosted on the Pi --> Node-Red (hosted on the Pi) --> MongoDb --> Node-Red-Dashboard
+
+Node-red pushes the data to the MongoDB Database and Node-Red-Dashboard to view the diagrams
 
 # Presenting the data
 
-The data is visualized with a dashboard in [Grafana](https://grafana.com/grafana/dashboards/). My dashboard consists of two sections. One for the real time data - showing the temperature and humidity right now and also if the sun exposure is okay right now. The other section shows the same data over time.
+The data is visualized with a dashboard in [Node-Red](https://nodered.org/). My dashboard consists of two sections. One for the real time data - showing the temperature and humidity right now and the status of the 2 soil meters. The other section shows the data over time.
 
-The data is sent to the database every 5 seconds. I did a rough calculations and the amount of storage space the data will take up. In my lifetime it will never succeed 4 GB. So, the data is stored forever.
+The data is sent to the database every hour. I did a rough calculations and the amount of storage space the data will take up. In my lifetime it will never succeed 4 GB. So, the data is stored forever.
 
 ![figure4](https://github.com/pajserman/IoT-plants/blob/master/images/figure4.png)
-*Figure 4: The dashboard in Grafana*
+*Figure 4: The dashboard in Node-Red*
 
-I also made a [simple web site](https://plant.hannes.pro) that presents the real time data that is open to the internet. The simple back-end and front-end code can be found under the folder [*other*](https://github.com/pajserman/IoT-plants/tree/master/other).
-
-![figure5](https://github.com/pajserman/IoT-plants/blob/master/images/figure5.jpg)
-*Figure 5: The simple website available on the internet at [plant.hannes.pro](https://plant.hannes.pro)*
 # Finalizing the design
 
-Thinking back on the project it went very well. I had some trouble making the sunshine sensor work at first and also had problems with the Picos code crashing. But with some patience and debugging I got everything working.
+Thinking back on the project it went very well after becomming familiar with the Pico pin-out. I had some trouble making the moister sensors work at first but after some debbuging it was working fine.
 
-There is still room for improvement. The sunshine sensor draws more power than it needs to and there is probably a much better way of implementing it. In the future I would want to make 3D printed case for the sensor and solder it to something like a printed circuit board.
-
-![figure6](https://github.com/pajserman/IoT-plants/blob/master/images/figure6.jpg)
-*Figure 6: The sensor hard at work*
-
-
-
-| ![figure7a](https://github.com/pajserman/IoT-plants/blob/master/images/figure7a.jpg) | ![figure7b](https://github.com/pajserman/IoT-plants/blob/master/images/figure7b.jpg) |
-| ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
-
-*Figure 7: The sensor in shade vs in direct sunshine*
-
----
-
-# How the sunshine sensor works
-
-In this example the potentiometer is not included as it does not really change anything in the explanation. If we assume the transistor is correctly biased, we can use the switch model (the transistor acts as switch either letting trough current or not).
-
-> [!IMPORTANT]
-> This is a very simple explanation on how the sunshine sensor works. Most of the facts I am saying here should be taken with a grain of salt. To explain the whole sensor in detail it would probably make the whole tutorial  twice as long.
-### In the dark
-
-In the diagram below the photo resistor is in the dark making its resistance very high. This makes it so that almost all of the voltage falls over the photo resistor. The voltage at the base of the transistor is larger which makes the transistor turn on.
-
-The red arrows show the path of the current. Since the node Vs is directly connected to ground through the transistor, the current will not take that path through the 100 kohm resistor.
-
-Dark outside -> transistor on -> LED on -> Vs = 0
-
-![figure8](https://github.com/pajserman/IoT-plants/blob/master/images/figure8.svg)
-*Figure 8: Circuit diagram in the dark*
-### In sunshine
-
-In bright light the photo resistor almost has no resistance, making it act like a straight connection to ground. Now all of the voltage will fall over the 470 ohm resistor making the voltage at the base of the transistor 0. The transistor is turned off and the direct path to ground is cut off. The current must now take the path through the 100 kohm resistor. Since the 100 kohm is much much larger than 470 ohm, almost all of the voltage will fall over it. Making the potential in the node Vs equal to 3.3 V. No current will go through the LED since the voltage over it is 0 (LEDs has what is known as a [forward voltage](https://www.google.com/search?q=forward+voltage+red+LED&oq=forward+voltage+red+LED&gs_lcrp=EgZjaHJvbWUyCQgAEEUYORiABDIICAEQABgWGB4yCAgCEAAYFhgeMgoIAxAAGIAEGKIEMgoIBBAAGIAEGKIE0gEIMzYxOGowajeoAgCwAgA&sourceid=chrome&ie=UTF-8)).
-
-Bright light -> transistor off -> LED off -> Vs = 3.3 V
-
-![figure9](https://github.com/pajserman/IoT-plants/blob/master/images/figure9.svg)
-*Figure 9: Circuit diagram in bright light*
-
+There is still room for improvement. The dashboard could use some redesign and the output from the database could also be neater. The finilized casing for outdoor use remains to be solved and made waterproof.
 
 # Acknowledgements
 I want to thank my teacher and TA:s from the course for their guidance and support throughout this project.
