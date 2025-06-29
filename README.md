@@ -264,14 +264,14 @@ The data is visualized with a dashboard in [Node-Red](https://nodered.org/). My 
 
 The data is sent to the database every hour. I did a rough calculations and the amount of storage space the data will take up. In my lifetime it will never succeed 4 GB. So, the data is stored forever.
 
-![figure4](https://github.com/pajserman/IoT-plants/blob/master/images/figure4.png)
+![figure4](https://github.com/egsdandd/Sommar25/blob/main/img/jord.jpg)
 *Figure 4: The dashboard in Node-Red*
 
 # Finalizing the design
 
 Thinking back on the project it went very well after becomming familiar with the Pico pin-out. I had some trouble making the moister sensors work at first but after some debbuging it was working fine.
 
-There is still room for improvement. The dashboard could use some redesign and the output from the database could also be neater. The finilized casing for outdoor use remains to be solved and made waterproof.
+There is still room for improvement. I have some issues with the Node-Red disconnecting from the server every now and then. The dashboard could use some redesign and the output from the database could also be neater. The finilized casing for outdoor use remains to be solved and made waterproof. 
 
 # Acknowledgements
 I want to thank my teacher and TA:s from the course for their guidance and support throughout this project.
