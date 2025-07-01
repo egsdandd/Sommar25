@@ -9,6 +9,7 @@ import time
 import dht
 from machine import Pin, ADC, PWM
 import gc
+from wifi import do_connect, disconnect_wifi, is_connected, get_ip_address, get_network_info, get_signal_strength, get_mac_address
 
 # Pin layout:
 Log("Initializing onboard LED", "INFO")
@@ -181,6 +182,7 @@ def main():
             time.sleep(300)
             continue
         try:
+            do_connect()  # Connect to Wi-Fi
             FlashLed(2)  # Flash LED to indicate data read
             #Buzzer(1)
             # Publish data to MQTT broker
@@ -194,8 +196,10 @@ def main():
             # client.publish("egsdand/feeds/adc_voltage", str(ADC_voltage))
             print("Data published successfully")
             # Buzzer(2)
+            disconnect_wifi() # Disconnect from WIFI
+
         except Exception as e:
             print("Publish failed:", e)
-        time.sleep(10)
+        time.sleep(120)
 
 main()
