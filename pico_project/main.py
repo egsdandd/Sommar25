@@ -45,7 +45,7 @@ def read_calibrated_temperature():
     volt = (VREF_ACTUAL / 65535) * adc_value
     raw_temperature = 27 - (volt - 0.706) / 0.001721
     calibrated_temperature = (raw_temperature * TEMP_SLOPE_CORRECTION) + TEMP_OFFSET
-    Log(f"Raw ADC value: {adc_value}, Voltage: {volt:.2f}V, Raw Temperature: {raw_temperature:.2f}°C, Calibrated Temperature: {calibrated_temperature:.2f}°C", "DEBUG")
+    # Log(f"Raw ADC value: {adc_value}, Voltage: {volt:.2f}V, Raw Temperature: {raw_temperature:.2f}°C, Calibrated Temperature: {calibrated_temperature:.2f}°C", "DEBUG")
     return raw_temperature, calibrated_temperature, volt
 
 # Flash led        

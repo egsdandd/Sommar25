@@ -8,7 +8,7 @@ def do_connect():
     wlan = network.WLAN(network.STA_IF) # Station mode
     wlan.active(True) # Activate the WLAN interface
     if not wlan.isconnected(): # Check if already connected
-        print('connecting to network...')
+        print('Connecting to WiFi...')
         wlan.connect(config.ssid, config.password) # Connect to the Wi-Fi network using SSID and password from config
         print('Waiting for connection...ssid:', config.ssid) # Print the SSID being connected to
         while not wlan.isconnected(): # Wait until connected
