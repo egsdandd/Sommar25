@@ -264,9 +264,9 @@ The data is visualized with a dashboard in [Node-Red](https://nodered.org/). My 
 
 The data is sent to the database every hour. I did a rough calculations and the amount of storage space the data will take up. In my lifetime it will never succeed 4 GB. So, the data is stored forever.
 
-![figure4](https://github.com/egsdandd/Sommar25/blob/main/img/jord.png)
+![figure3](https://github.com/egsdandd/Sommar25/blob/main/img/jord.png)
 
-*Figure 4: The dashboard in Node-Red*
+*Figure 3: The dashboard in Node-Red*
 
 # Finalizing the design
 
