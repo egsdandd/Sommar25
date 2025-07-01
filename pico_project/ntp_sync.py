@@ -20,3 +20,5 @@ def sync_time(timezone_offset=0):
     except Exception as e:
         print("Failed to synchronize time:", e)
         return False
+    print("Time synchronized with NTP server!")
+    
