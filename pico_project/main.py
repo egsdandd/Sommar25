@@ -170,25 +170,27 @@ def main():
     
     while True:
         try:
-            ADC_temperature, ADC_calibrated_temperature, ADC_voltage = read_calibrated_temperature()
-            print("ADC Temperature:", ADC_temperature, "°C")
+            ADC_temperature, ADC_calibrated_temperature, ADC_voltage = read_calibrated_temperature() # Read and calibrate temperature from ADC
+            if ADC_temperature is None or ADC_calibrated_temperature is None:
+                Log("Failed to read temperature from ADC", "ERROR")
+                continue  # Skip to the next iteration if reading fails
 
-            temperature, humidity = read_DHT22()
+            print("ADC calibrated Temperature:", ADC_calibrated_temperature, "°C") 
 
-            moist = plant_Monitor(sensorVCC,[soil_Sensor1,soil_Sensor2]) 
-            plant_Left_Moist_Level = moist[0]
-            plant_Right_Moist_Level = moist[1]
+            temperature, humidity = read_DHT22() # Read temperature and humidity from DHT22 sensor
 
+            moist = plant_Monitor(sensorVCC,[soil_Sensor1,soil_Sensor2]) # Read soil moisture levels for both plants
+            if moist is None or len(moist) < 2:
+                Log("Failed to read moisture levels from sensors", "ERROR")
+                continue
+            plant_Left_Moist_Level = moist[0] # Get moisture level for left plant
+            plant_Right_Moist_Level = moist[1] # Get moisture level for right plant
             print("Plant Left Moisture Level:", plant_Left_Moist_Level, "%")
             print("Plant Right Moisture Level:", plant_Right_Moist_Level, "%")
-            plants =[
-                ["left",plant_Right_Moist_Level,50],
-                ["right",plant_Left_Moist_Level,50]
-            ]
-            # print("Plants:", plants)  
-        except Exception as e:
+
+        except Exception as e: # Handle any exceptions that occur during sensor reading
             print("Sensor read failed:", e)
-            time.sleep(300)
+            time.sleep(300) # Wait for 5 minutes before retrying
             continue
         try:
             connect_wifi()  # Connect to Wi-Fi
@@ -197,18 +199,23 @@ def main():
             # Publish data to MQTT broker
             client.publish("egsdand/feeds/picow_temp", str(temperature))
             client.publish("egsdand/feeds/picow_hum", str(humidity))
-            # client.publish("egsdand/feeds/adc_temp", str(ADC_temperature))
+
             client.publish("egsdand/feeds/moisture1", str(plant_Left_Moist_Level))
             client.publish("egsdand/feeds/moisture2", str(plant_Right_Moist_Level))
-            # client.publish("egsdand/feeds/plants", str(plants))
+
             client.publish("egsdand/feeds/adc_calibrated_temp", str(ADC_calibrated_temperature))
+
             # client.publish("egsdand/feeds/adc_voltage", str(ADC_voltage))
+            # client.publish("egsdand/feeds/adc_temp", str(ADC_temperature))
+            # client.publish("egsdand/feeds/plants", str(plants))
+            
             print("Data published successfully")
             # Buzzer(2)
             disconnect_wifi() # Disconnect from WIFI
 
-        except Exception as e:
-            print("Publish failed:", e)
-        time.sleep(120)
+        except Exception as e: # Handle any exceptions that occur during MQTT publishing
+            print("MQTT publish failed:", e)
+
+        time.sleep(10) # Wait for 2 minutes before the next iteration
 
 main()

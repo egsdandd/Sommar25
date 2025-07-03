@@ -212,11 +212,12 @@ I have divided my code in smaller modules according to this:
 
 *Figure 3: Github*
 
-I think it should be easy to understand the functionality of each file
+I think it should be easy to understand the functionality of each file. Note - config.tmpl is just at template and You need to change it and rename it to config.py
+The reading of the soil sensurs are done 5 times in a row and the an average is calculated out of these reads.
 
 I would describe the code as consisting of 3 main functions/sections:
 
-- the `connect_to_wifi() and disconect_wifi` function
+- the `connect_to_wifi() and disconect_wifi` functions
 - the `connect_to_mqtt()` function
 - and the *main while loop*
 
