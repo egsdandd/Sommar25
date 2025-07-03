@@ -3,8 +3,13 @@ import network
 import time
 import config
 import machine
+from machine import Pin
+
+led = Pin("LED", Pin.OUT)  # Alarm pin for external alarm - Inbyggd LED på Pico W
+led.off()  # Turn off the LED as a starting point
 
 def do_connect():
+    led.on()  # Turn on the LED to indicate connection attempt
     wlan = network.WLAN(network.STA_IF) # Station mode
     wlan.active(True) # Activate the WLAN interface
     if not wlan.isconnected(): # Check if already connected
@@ -14,6 +19,7 @@ def do_connect():
         while not wlan.isconnected(): # Wait until connected
             time.sleep(0.5)
     print('Connected to Wi-Fi:', wlan.ifconfig())
+    led.off()  # Turn off the LED to indicate successful connection
 
 def disconnect_wifi(): # Disconnect from Wi-Fi
     wlan = network.WLAN(network.STA_IF) # Station mode

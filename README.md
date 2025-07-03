@@ -5,7 +5,9 @@
 **Time to complete build**: 3-5 days
 
 > [!NOTE]
-> A lot of the text is copied from one of last years (2024) students who did something wery similar to my project. I have updated the sections that differs but he should have all the credits for doing the time consuming work with the tabel of components and materials used in the project and for most of the backgrund information. My project can be found [here](
+> Some text is copied from one of last years (2024) students who did something wery similar to my project. I have updated the sections that differs but he should have credits for doing the time consuming work with the tabel of components and materials used in the project and for some of the backgrund information. 
+
+My project can be found [here](https://github.com/egsdandd/Sommar25)
 
 This tutorial walks through the steps of making a simple IoT-device that can monitor temperature and humidity of the environment around your plants. This tutorial was made as an assignment to a [IoT-course](https://lnu.se/en/course/introduction-to-applied-internet-of-things/distance-international-summer/) at Linnaeus University. The project takes about 5 days to build and maybe 2 extra for setting up the digital infrastructure. It all depends on how comfortable you are with programming and if you have self-hosted services before.
 
@@ -45,7 +47,7 @@ This tutorial walks through the steps of making a simple IoT-device that can mon
 
 # Objective
 
-The inspiration for this project came to me as a result of spending most of my summer at our summer house and then leaving our home unattended. I do have a watering system in place that runs on a schedule and I am also monitoring the waterflow in case ther should be a problem with the piping. However living in Sweden close to the coast you can never predict how much rain that will fall locally. I then decided to measure the humidity around the plants and based on that change the watering schedule. I also included a device to measure the air temperature and humidity and also the actual temperature of the device.
+The inspiration for this project came to me as a result of spending most of my summer at our summer house and then leaving our home unattended. I do have a watering system in place that runs on a schedule and I am also monitoring the waterflow in case ther should be a problem with the piping. However living in Sweden close to the coast you can never predict how much rain that will fall locally. I then decided to measure the humidity around the plants and based on that change the watering schedule. I also included a device to measure the air temperature and humidity and also the actual temperature of the device itself since it will be installed in some kind of box.
 
 ![figure1](https://github.com/egsdandd/Sommar25/blob/main/img/utebild.jpg)
 *Figure 1: The outdoor plants*
@@ -56,9 +58,6 @@ Hopefully this data helps me understand how much water my plants get and adjust 
 
 > [!NOTE]
 > The materials I used in the project is included in teh basic pack recomended for the course but i bougt the 2 soil sensors separatly. I realize now that the project can be a bit expensive if you have to buy all of these things at once, especially the Raspberry Pi. Just note that the Raspberry can host a  lot of stuff and be used in multiple projects at once! You probably won't regret buying one!
-
-> [!TIP]
-> A lot of the basic components such as LEDs and resistors are cheaper to buy in larger numbers. Might not hurt to order a few extra!
 
 ### Components needed for building the environment-sensor.
 
@@ -78,11 +77,11 @@ Hopefully this data helps me understand how much water my plants get and adjust 
 > [!NOTE]
 > In this project I have chosen to self-host everything. To host the servers, you are going to need a computer on your network that is running at all times. More precisely in this tutorial, a computer running a [Linux OS](https://en.wikipedia.org/wiki/Linux). I have chosen to host my project on a Raspberry Pi 3b+ I had laying around. If you do not already have a computer hosting stuff on your network, buying a Raspberry Pi is what I recommend.
 
-| Part             | Picture                                                                                | Where to buy                                                                         | Amount | Price (as of 2024-06-25) | Note                                                                                                                                                                                       |
+| Part             | Picture                                                                                | Where to buy                                                                         | Amount | Price (as of 2025-07-03) | Note                                                                                                                                                                                       |
 | ---------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | ------ | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Raspberry Pi 3b+ | ![](https://www.electrokit.com/cache/b5/700x700-quick_b4_c4_964d_41016338-2.jpg)       | [Link](https://www.electrokit.com/raspberry-pi-3-1gb-model-bplus)                    | 1 pcs  | 499 SEK                  | What I've used. There are newer models and other brands work as well. Have built in WIFI.                                                                                                 |
-| SD-card 16 GB    | ![](https://www.electrokit.com/cache/94/700x700-product_41013_41013405_41013405-3.jpg) | [Link](https://www.electrokit.com/minneskort-microsdhc-16gb)                         | 1 pcs  | 129 SEK                  | Used for hosting the OS and long term memory. 16 GB should be plenty for this project. If you are planning on hosting other stuff on your raspberry you can buy SD-card with more storage. |
-| Power supply     | ![](https://www.electrokit.com/cache/0d/700x700-product_41017_41017115_41017115.jpg)   | [Link](https://www.electrokit.com/raspberry-pi-4-stromforsorjning-5v-3a-usb-c-svart) | 1 pcs  | 99 SEK                   | Something like this. Any power supply rated the same works.                                                                                                                                |
+| Raspberry Pi 3b+ | ![](https://www.electrokit.com/cache/b5/700x700-quick_b4_c4_964d_41016338-2.jpg)       | [Link](https://www.electrokit.com/raspberry-pi-3-1gb-model-bplus)                    | 1 pcs  | 479 SEK                  | What I've used. There are newer models and other brands work as well. Have built in WIFI.                                                                                                 |
+| SD-card 16 GB    | ![](https://www.electrokit.com/cache/94/700x700-product_41013_41013405_41013405-3.jpg) | [Link](https://www.electrokit.com/minneskort-microsdhc-16gb)                         | 1 pcs  | 89 SEK                  | Used for hosting the OS and long term memory. 16 GB should be plenty for this project. If you are planning on hosting other stuff on your raspberry you can buy SD-card with more storage. |
+| Power supply     | ![](https://www.electrokit.com/cache/0d/700x700-product_41017_41017115_41017115.jpg)   | [Link](https://www.electrokit.com/raspberry-pi-4-stromforsorjning-5v-3a-usb-c-svart) | 1 pcs  | 149 SEK                   | Something like this. Any power supply rated the same works.                                                                                                                                |
 # Computer setup
 
 The Pico W is the heart of the IoT-device and runs all the code and also sends the messages over the network. The Pico can be programmed with a lot of different programming languages. In this project the code is implemented in the language [MicroPython](https://micropython.org/). To write the program and write the code to the Pico [Microsoft’s Visual Studio Code](https://code.visualstudio.com/)  was used as the preferred [IDE](https://www.codecademy.com/article/what-is-an-ide). **Down below are the steps for getting started with writing code to your Pico if you are using Windows on your PC. The rough steps are the same if you using MAC.**  If you get stuck, do not be afraid to google around for help. There are a lot of helpful tutorials out there on the internet!
@@ -121,10 +120,10 @@ When you are feeling confident in writing code to the Pico, clone the GitHub rep
 
 Before writing the code to your Pico you are going to need to change some variables. In the *config.py* file, under fill out yor information:
 
-ssid = "MyWifiNetwork"
-password = "MyWifiPassword"
-mqtt_user = "mqttuser"
-mqtt_password = "mqttpassword"
+ssid = "MyWifiNetwork", 
+password = "MyWifiPassword", 
+mqtt_user = "mqttuser", 
+mqtt_password = "mqttpassword", 
 mqtt_server = "mqtt_server_ip"
 
 The *ssid* and *password* variables are the name and password of your WIFI network. The *mqtt_user* and *mqtt_password* are the username and password for your MQTT broker. The *mqtt_server* is the IP address of your MQTT broker. If you are using a Raspberry Pi, this is probably the IP address of your Raspberry Pi.
@@ -140,7 +139,7 @@ When everything set you are good to upload the code to the Pico.
 > - Constant light = No WIFI/trying to connect to WIFI
 > - Flash = sent data to MQTT broker
 >
-> So, it should go something like this when you connect your Pico to the power supply: The LED turns on and stays on for a few seconds, then the LED turns off and starts to flash every 5 seconds (the data is sent every 5 seconds)
+> So, it should go something like this when you connect your Pico to the power supply: The LED turns on and stays on for a few seconds, then the LED turns off and starts to flash every every time the data is ent to the brooker.
 >
 > Have the Pico connect to a terminal while setting up the sensor. Useful information about its state is printed to the terminal. Such as the connection to the WIFI or if a sensor is not connected properly.
 
@@ -149,7 +148,7 @@ When everything set you are good to upload the code to the Pico.
 ![figure2](https://github.com/egsdandd/Sommar25/blob/main/img/ritning.jpg)
 *Figure 2: Connecting*
 
-The whole device can be split in 4 parts: The **Pico**, the **soil hygrometer**, the **temperature and humidity sensor** and the **buzzer**. I am not going to provide a diagram that shows you exactly where to put things on the breadboard; as it would be too messy. Everything except the sunshine detector is as straight forward as just connecting the device directly to the Pico.
+The whole device can be split in 4 parts: The **Pico**, the **soil hygrometer**, the **temperature and humidity sensor** and the **buzzer**. I am not going to provide a diagram that shows you exactly where to put things on the breadboard; as it would be too messy. 
 
 > [!CAUTION]
 > Always disconnect the power supply when connecting the electronics together! Sudden changes in voltage and current can damage the components!
@@ -185,14 +184,14 @@ If you do not want the buzzer, you can just skip this step.
 
 # Platform
 
-As mentioned before, the whole solution is self-hosted on a Raspberry Pi on my own network. Mostly because I care about privacy. I wanted to make it easy for myself and searched the web for a pre made [docker-compose](https://docs.docker.com/compose/) MQTT-brooker called Mosquitto that can be used in my project with Docker-Compose. 
+As mentioned before, the whole solution is self-hosted on a Raspberry Pi on my own network. Mostly because I care about privacy. I wanted to make it easy for myself and searched the web for a pre made [docker-compose](https://docs.docker.com/compose/) MQTT-brooker called Mosquitto ( I use eclipse-mosquitto ) that can be used in my project with Docker-Compose. 
 
-There are many others to choose from and another example is [this](https://learnembeddedsystems.co.uk/easy-raspberry-pi-iot-server) tutorial which can be, if preferred:  The tutorial is using [this](https://github.com/SensorsIot/IOTstack) GitHub repository for installing the stack. The repository comes with a bash script that automatically builds the docker-compose yml file for you! The bash script also has options for backing up your data.
+There are many others to choose from and another example is [this](https://learnembeddedsystems.co.uk/easy-raspberry-pi-iot-server) tutorial which can be used, if preferred:  The tutorial is using [this](https://github.com/SensorsIot/IOTstack) GitHub repository for installing the stack. The repository comes with a bash script that automatically builds the docker-compose yml file for you! The bash script also has options for backing up your data.
 
 I choosed to install my own on my Raspberry Pi as it is good learning experience. The stack consist of:
 
-* [Mosquitto](https://mosquitto.org/) (Docker based MQTT Broker)
-* [MongoDB ](https://www.mongodb.com/) (Docker based Database)
+* [Mosquitto](https://mosquitto.org/) (Docker based MQTT Broker - eclipse-mosquitto )
+* [MongoDB ](https://www.mongodb.com/) (Docker based Database - mongodb/mongodb-community-server:4.4.3-ubuntu2004, this is an old version that is EOL but worked for me )
 * [Node-red](https://nodered.org/) (programming tool for connecting devices. In this case the MQTT Broker with the MongoDB Database). This I installed plain even though it is available as a docker image.
 * [Node-red-desktop](https://nodered.org/)  (For visualizing the data I use rev 2.0.0 of the dashboard)
 
@@ -254,9 +253,9 @@ Down below is the main loop that runs indefinitely. I think the code is pretty s
 
 Down below is a graph that describes how the whole project is connected together. The data from the DHT11 sensor is sent over a proprietary protocol managed by the DHT11 library using a physical wire. The soil sensors works the same way. The Pico sends the environment data every 60 seconds over WIFI using the MQTT protocol to the brooker. The router forwards the message from the Pico to the Raspberry Pi where the Mosquito MQTT broker listens on that port. The data then takes this path:
 
-Sensors --> Pico --> MQTT-broker hosted on the Pi --> Node-Red (hosted on the Pi) --> MongoDb --> Node-Red-Dashboard
+Sensors --> Pico --> MQTT-broker Docker hosted on the Pi --> Node-Red (hosted on the Pi) --> MongoDb (Docker host) --> Node-Red-Dashboard
 
-Node-red pushes the data to the MongoDB Database and Node-Red-Dashboard to view the diagrams
+Node-red pushes the data to the MongoDB Database and Node-Red-Dashboard to view the diagrams. The Node-Red-Dashboard reads long time data from Mong and displays it in a separate chart.
 
 # Presenting the data
 
@@ -272,7 +271,9 @@ The data is sent to the database every hour. I did a rough calculations and the 
 
 Thinking back on the project it went very well after becomming familiar with the Pico pin-out. I had some trouble making the moister sensors work at first but after some debbuging it was working fine.
 
-There is still room for improvement. I have some issues with the Node-Red disconnecting from the server every now and then. The dashboard could use some redesign and the output from the database could also be neater. The finilized casing for outdoor use remains to be solved and made waterproof. 
+There is still room for improvement. I had some issues with the Node-Red disconnecting from the server every now and then. The dashboard could use some redesign and the output from the database could also be neater. The finilized casing for outdoor use remains to be solved and made waterproof.
+
+Raspberry PI 3+ (and 4) are old by now and I would recommend investing in a Raspberry 5 that will allow updating the database to a more updated version. 
 
 # Acknowledgements
 I want to thank my teacher and TA:s from the course for their guidance and support throughout this project.

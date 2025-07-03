@@ -50,7 +50,7 @@ def read_calibrated_temperature():
 
 # Flash led        
 def FlashLed(noOfTimes):
-    print("Flashing LED", noOfTimes, "times")
+    # print("Flashing LED", noOfTimes, "times")
     led.off() # Make sure led is off
     for i in range(noOfTimes,0,-1): 
         led.on()
@@ -74,9 +74,8 @@ def Buzzer(noOfTimes):
 
 # Flash led to indicate startup
 Log("Starting up...", "INFO")
-# Flash LED to indicate startup
-FlashLed(1)
-Buzzer(1)
+Buzzer(1) # Beep once to indicate startup
+
 # DHT22-sensor
 def read_DHT22():
     dht_sensor.measure() # Measure temperature and humidity
