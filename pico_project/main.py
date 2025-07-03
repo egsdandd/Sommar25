@@ -7,6 +7,7 @@ from mqtt_helper import connect_mqtt
 from logging_helper import Log, currentLogLevel, logLevels  # Importera loggningsfunktionen
 import time
 import dht
+import machine
 from machine import Pin, ADC, PWM
 import gc
 from wifi import connect_wifi, disconnect_wifi, is_connected, get_ip_address, get_network_info, get_signal_strength, get_mac_address
