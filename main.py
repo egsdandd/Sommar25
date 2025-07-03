@@ -215,7 +215,7 @@ def main():
             continue
         try:
             connect_wifi()  # Connect to Wi-Fi
-            time.sleep(2)  # Wait for Wi-Fi to stabilize
+            time.sleep(1)  # Wait for Wi-Fi to stabilize
             if not is_connected():  # Check if Wi-Fi is connected
                 Log("Not connected to Wi-Fi...connecting", "INFO")
                 print("Connecting to Wi-Fi...")

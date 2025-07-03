@@ -15,15 +15,28 @@ logLevels = {
 }
 
 currentLogLevel = logLevels["INFO"]  # Change this to set the current log level
+def set_log_level(level):
+    global currentLogLevel
+    if level in logLevels:
+        currentLogLevel = logLevels[level]
+    else:
+        raise ValueError(f"Invalid log level: {level}")
 
-import uos  # To check free space on the filesystem
+# Controll if there is enough free space on the filesystem
+# Returns True if there is enough free space, otherwise returns False
+# This function checks if there is enough free space on the filesystem
+# It uses the `uos.statvfs` function to get filesystem statistics
+# It checks the free space in bytes and compares it to a minimum required space
+# If the free space is greater than the minimum required space, it returns True
+# Otherwise, it returns False
+# The default minimum required space is set to 1024 bytes (1 KB)
+# This function can be used to ensure that there is enough space for logging or other operations
 
 def has_free_space(min_bytes=1024):
     stat = uos.statvfs('/')
     block_size = stat[0]
     free_blocks = stat[3]
     free_bytes = block_size * free_blocks
-    #print(f"Free space: {free_bytes} bytes")  # Debugging output
     return free_bytes > min_bytes  # min_bytes = minimum free space required
 
 def Log(message, level="INFO"):
