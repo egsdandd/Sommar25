@@ -206,6 +206,8 @@ I choosed to install my own on my Raspberry Pi as it is good learning experience
 The code on the Pico is very simple. Half of the lines in the [*main.py*] file is mostly importing libraries and setting up constants. The reason the code is so small is because of the extensive use of libraries. The DHT11 library (which comes with MicroPython) makes the collecting of the data from the DHT11 sensor as easy as just running a function - no need for setting up communications with the sensor yourself. The *umqttsimple* library, found in the [*umqtt*] folder, manages all the communication with the MQTT protocol. To set up WiFi/MQtt and the loggingfunctionality I used the [*network*](https://docs.micropython.org/en/latest/library/network.html) and [*logging*](https://docs.micropython.org/en/latest/library/logging.html) libraries that come with MicroPython. The code is written in a way that it can be easily extended to include more sensors or features.
 
 I have divided my code in smaller modules according to this:
+
+
 ![figure3](https://github.com/egsdandd/Sommar25/blob/main/img/github.png)
 
 *Figure 3: Github*
