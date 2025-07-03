@@ -9,7 +9,7 @@ import time
 import dht
 from machine import Pin, ADC, PWM
 import gc
-from wifi import do_connect, disconnect_wifi, is_connected, get_ip_address, get_network_info, get_signal_strength, get_mac_address
+from wifi import connect_wifi, disconnect_wifi, is_connected, get_ip_address, get_network_info, get_signal_strength, get_mac_address
 
 # Pin layout:
 Log("Initializing onboard LED", "INFO")
@@ -77,20 +77,27 @@ Log("Starting up...", "INFO")
 Buzzer(1) # Beep once to indicate startup
 
 # DHT22-sensor
+
 def read_DHT22():
-    dht_sensor.measure() # Measure temperature and humidity
-    # Wait for sensor to stabilize
-    time.sleep(2)  # DHT22 needs a few seconds to stabilize after power
-    temperature = dht_sensor.temperature() # Get temperature in Celsius
-    if (temperature is None):
-        Log("Failed to read temperature from DHT22", "ERROR")
+    try:
+        dht_sensor.measure()  # Measure temperature and humidity
+        time.sleep(2)         # DHT22 requires a 2-second delay to stabilize after power-up
+        temperature = dht_sensor.temperature()  # Gets temperature in Celsius
+        if temperature is None: 
+            Log("Failed to read temperature from DHT22", "ERROR") # If temperature reading fails, log an error
+            return None, None
+        humidity = dht_sensor.humidity()        # Gets humidity in percentage
+        if humidity < 0 or humidity > 100:  # Check if humidity is within valid range
+            Log("Humidity reading out of range (0-100%)", "ERROR") # If humidity is out of range, log an error
+            return None, None
+        if humidity is None: # If humidity reading fails, log an error
+            Log("Failed to read humidity from DHT22", "ERROR") # If humidity reading fails, log an error
+            return None, None
+        return temperature, humidity
+    except Exception as e:
+        Log(f"Exception occurred while reading DHT22: {e}", "ERROR")
         return None, None
-    humidity = dht_sensor.humidity() # Get humidity in percentage
-    if (humidity is None):
-        Log("Failed to read humidity from DHT22", "ERROR")
-        return None, None
-    # print("Temperature:", temperature, "°C, Humidity:", humidity, "%")
-    return temperature, humidity
+
 
 def outlier_Deleter(value_Array):
     value_Array = sorted(value_Array) # Sort the array to calculate quartiles
@@ -113,21 +120,23 @@ def outlier_Deleter(value_Array):
 def moisture_Precent(curr_Val):  
     dry_Soil_Value = 65535 # Max value, Wet soil
     wet_Soil_Value = 0 # Min value, Desert 
-    percent = (curr_Val - dry_Soil_Value) * (100) / (wet_Soil_Value - dry_Soil_Value)
+    percent = (curr_Val - dry_Soil_Value) * (100) / (wet_Soil_Value - dry_Soil_Value) # Calculate the percentage of moisture
+    if percent < 0: # If the percentage is less than 0, set it to 0
+        percent = 0
     return round(percent, 2)
 
-def read_Sensor_Average(samples, plant_Reader, plantVCC):
-    total = []
-    return_Array = []
-
+def read_Sensor_Average(samples, plant_Reader, plantVCC): # Read soil sensors and return average moisture levels
+    total = [] # Array to hold all measurements
+    return_Array = [] # Array to hold the final moisture levels for each plant
     for _ in range(samples): # Run samples time
-        plantVCC.value(1)  
-        time.sleep(0.005)
-        single_Mesure_Array = []
+        plantVCC.value(1)  # Turn on VCC for soil sensors
+        time.sleep(0.005) # Wait for sensors to stabilize
+        single_Mesure_Array = [] # Array to hold single measurements for each plant
         for sensor in plant_Reader: # Loop over all plants
             single_Mesure_Array.append(sensor.read_u16()) # Create array [Value plant1, Value plant2,...]
+        # print("Single measurement array:", single_Mesure_Array) # Print the single measurement array
         total.append(single_Mesure_Array) # Create array [[Value plant1, Value plant2,...],[Value plant1, Value plant2,...]]
-        plantVCC.value(0)  
+        plantVCC.value(0)  # Turn off VCC for soil sensors
         time.sleep(0.005)
     for i in range(len(plant_Reader)):# Loop over the number of plants 
         clean_Value_array = outlier_Deleter([row[i] for row in total]) # Take out the values associate with the plant and clean the array from outliers
@@ -142,9 +151,9 @@ def plant_Monitor (plantVCC,sensorArray):
     return_Array = [] # Array to hold the final moisture levels for each plant
     for _ in range (sampleSize): #As the mesurmement of soil is noizy I collect 5 moisture value per plant
         plant_moist_Value = read_Sensor_Average(sampleSize,sensorArray, plantVCC) # Collect moisture value
-        moistureData.append(plant_moist_Value)
+        moistureData.append(plant_moist_Value) # Append the moisture value to the moistureData array
     
-    for i in range(len(sensorArray)):
+    for i in range(len(sensorArray)): # Loop over the number of plants
         moisture_Plant = outlier_Deleter([row[i] for row in moistureData]) # Take out the values associate with the plant and clean the array from outliers
         moisture = sum(moisture_Plant) / len(moisture_Plant) # Calculate the mean value of the clean array
         return_Array.append(moisture) # Append mosture level to retrun array [Mean_Moist_Level_Plant_1, Mean_Moist_Level_Plant_2,...]
@@ -156,7 +165,7 @@ def main():
     currentLogLevel = logLevels["INFO"]
     
     Log("Starting up...", "INFO")
-    client = connect_mqtt()
+    client = connect_mqtt() # Connect to MQTT broker
     
     while True:
         try:
@@ -181,7 +190,7 @@ def main():
             time.sleep(300)
             continue
         try:
-            do_connect()  # Connect to Wi-Fi
+            connect_wifi()  # Connect to Wi-Fi
             FlashLed(2)  # Flash LED to indicate data read
             #Buzzer(1)
             # Publish data to MQTT broker

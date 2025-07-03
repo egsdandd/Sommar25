@@ -8,7 +8,7 @@ from machine import Pin
 led = Pin("LED", Pin.OUT)  # Alarm pin for external alarm - Inbyggd LED på Pico W
 led.off()  # Turn off the LED as a starting point
 
-def do_connect():
+def connect_wifi():
     led.on()  # Turn on the LED to indicate connection attempt
     wlan = network.WLAN(network.STA_IF) # Station mode
     wlan.active(True) # Activate the WLAN interface
