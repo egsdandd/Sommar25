@@ -2,7 +2,7 @@
 # Copyright (c) 2025, Dan-Håkan Davall
 # Code free to use, modify, and distribute under the terms of the MIT License.
 
-import utime
+import utime, uos, gc
 
 # Loggnivåer
 logLevels = {
@@ -14,7 +14,17 @@ logLevels = {
     "SCREEN": 60,
 }
 
-currentLogLevel = logLevels["INFO"]  # Byt till "SCREEN" för att skriva till skärm
+currentLogLevel = logLevels["INFO"]  # Change this to set the current log level
+
+import uos  # To check free space on the filesystem
+
+def has_free_space(min_bytes=1024):
+    stat = uos.statvfs('/')
+    block_size = stat[0]
+    free_blocks = stat[3]
+    free_bytes = block_size * free_blocks
+    #print(f"Free space: {free_bytes} bytes")  # Debugging output
+    return free_bytes > min_bytes  # min_bytes = minimum free space required
 
 def Log(message, level="INFO"):
     if logLevels[level] >= currentLogLevel:
@@ -25,7 +35,10 @@ def Log(message, level="INFO"):
         )
         logMessage = f"[{formattedTime}] {level}: {message}"
         if currentLogLevel >= logLevels["SCREEN"]:
-            print(logMessage)  # Skriv till skärm om loggnivån är "SCREEN" eller högre
+            print(logMessage)
         else:
-            with open("log.txt", "a") as logFile:
-                logFile.write(logMessage + "\n")
+            if has_free_space(1024):  # Kontrollera att minst 1 KB finns kvar
+                with open("log.txt", "a") as logFile:
+                    logFile.write(logMessage + "\n")
+            else:
+                print("Varning: Otillräckligt diskutrymme för loggning!")

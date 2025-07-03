@@ -161,6 +161,16 @@ def plant_Monitor (plantVCC,sensorArray):
     gc.collect()  # Delete nonsense data, Keep memory free!
     return return_Array
 
+def is_mqtt_connected(client):
+    try:
+        # Försök att pinga brokern (om stöds)
+        client.ping()
+        return True
+    except Exception as e:
+        Log(f"MQTT connection lost: {e}", "ERROR")
+        return False
+
+
 def main():
      # Define log level
     currentLogLevel = logLevels["INFO"]
@@ -168,8 +178,16 @@ def main():
     Log("Starting up...", "INFO")
     Log("Starting up...", "DEBUG")
     Log("Starting up...", "ERROR")
-    client = connect_mqtt() # Connect to MQTT broker
-    
+    if not is_connected():
+        Log("Not connected to Wi-Fi...connecting", "INFO")
+        connect_wifi()
+
+    client = connect_mqtt()
+
+    if not is_mqtt_connected(client):
+        Log("Not connected to MQTT...reconnecting", "INFO")
+        client = connect_mqtt()
+
     while True:
         try:
             ADC_temperature, ADC_calibrated_temperature, ADC_voltage = read_calibrated_temperature() # Read and calibrate temperature from ADC
@@ -196,9 +214,14 @@ def main():
             time.sleep(300) # Wait for 5 minutes before retrying
             continue
         try:
-            #connect_wifi()  # Connect to Wi-Fi
-            #time.sleep(2)  # Wait for Wi-Fi to stabilize
+            connect_wifi()  # Connect to Wi-Fi
+            time.sleep(2)  # Wait for Wi-Fi to stabilize
+            if not is_connected():  # Check if Wi-Fi is connected
+                Log("Not connected to Wi-Fi...connecting", "INFO")
+                print("Connecting to Wi-Fi...")
+                connect_wifi()  # Connect to Wi-Fi
             #client = connect_mqtt() # Connect to MQTT broker
+    
             FlashLed(2)  # Flash LED to indicate data read
             #Buzzer(1)
             # Publish data to MQTT broker
@@ -216,15 +239,15 @@ def main():
             
             print("Data published successfully")
             # Buzzer(2)
-            #disconnect_wifi() # Disconnect from WIFI
+            disconnect_wifi() # Disconnect from WIFI
 
         except Exception as e: # Handle any exceptions that occur during MQTT publishing
             print("MQTT publish failed:", e)
             Log(f"MQTT publish failed: {e}", "ERROR")
 
         time.sleep(10) # Wait for 2 minutes before the next iteration
-        # print("Nu går Pico W ner i deepsleep i 10 sekunder...")
-        print("Nu är det dags...")
+        # Free up memory
+        gc.collect()  # Collect garbage to free up memory
 
 
 main()
