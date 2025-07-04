@@ -35,17 +35,20 @@ Log("Initializing ADC(4) for temperature measurement", "INFO")
 adc = machine.ADC(4) # ADC for temperature measurement on core
 
 # 
-VREF_ACTUAL = 3.3  # Mät denna med multimeter
-TEMP_OFFSET = 0.0  # Justera baserat på känd referenstemperatur
-TEMP_SLOPE_CORRECTION = 1.0  # Finjustera om nödvändigt
+VREF_ACTUAL = 3.3  # Check the actual reference voltage of the ADC, typically 3.3V for Pico W
+# TEMP_OFFSET and TEMP_SLOPE_CORRECTION are used to calibrate the temperature reading
+TEMP_OFFSET = 0.0  # Offset for temperature calibration, adjust if necessary
+# TEMP_SLOPE_CORRECTION is used to adjust the slope of the temperature reading,
+TEMP_SLOPE_CORRECTION = 1.0  # Slope correction for temperature calibration, adjust if necessary
             
-# Funktion för att läsa och kalibrera temperatur från ADC
-# Använder en 16-bitars ADC och konverterar till grader Celsius
-def read_calibrated_temperature():
-    adc_value = adc.read_u16()
-    volt = (VREF_ACTUAL / 65535) * adc_value
-    raw_temperature = 27 - (volt - 0.706) / 0.001721
-    calibrated_temperature = (raw_temperature * TEMP_SLOPE_CORRECTION) + TEMP_OFFSET
+# Function to read and calibrate temperature from ADC
+# This function reads the ADC value, converts it to voltage, and then calculates the temperature in degrees Celsius.
+# It uses a 16-bit ADC and converts the raw value to degrees Celsius.
+def read_calibrated_temperature(): 
+    adc_value = adc.read_u16() # Read the ADC value (0-65535 for 16-bit ADC)
+    volt = (VREF_ACTUAL / 65535) * adc_value # Convert ADC value to voltage
+    raw_temperature = 27 - (volt - 0.706) / 0.001721 # Convert voltage to temperature in Celsius using the formula for the temperature sensor
+    calibrated_temperature = (raw_temperature * TEMP_SLOPE_CORRECTION) + TEMP_OFFSET # Apply slope correction and offset to the raw temperature
     # Log(f"Raw ADC value: {adc_value}, Voltage: {volt:.2f}V, Raw Temperature: {raw_temperature:.2f}°C, Calibrated Temperature: {calibrated_temperature:.2f}°C", "DEBUG")
     return raw_temperature, calibrated_temperature, volt
 
