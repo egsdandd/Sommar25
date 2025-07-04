@@ -245,7 +245,7 @@ def main():
             print("MQTT publish failed:", e)
             Log(f"MQTT publish failed: {e}", "ERROR")
 
-        time.sleep(10) # Wait for 2 minutes before the next iteration
+        time.sleep(120) # Wait for 2 minutes before the next iteration
         # Free up memory
         gc.collect()  # Collect garbage to free up memory
 

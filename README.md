@@ -302,6 +302,9 @@ The long time data is updated with the help of a node-red inject node that trigg
 
 *Figure 4: The dashboard in Node-Red for the soil sensors*
 
+![figure4](https://github.com/egsdandd/Sommar25/blob/main/img/dubbla.png)
+
+*Figure 4: The dashboard in Node-Red for the DHT11 and Pico internal sensor*
 # Finalizing the design
 
 Thinking back on the project it went very well after becomming familiar with the Pico pin-out. I had some trouble making the moister sensors work at first but after some debbuging it was working fine.
@@ -309,6 +312,8 @@ Thinking back on the project it went very well after becomming familiar with the
 There is still room for improvement. I had some issues with the Node-Red disconnecting from the server every now and then. The dashboard could use some redesign and the output from the database could also be neater. The finilized casing for outdoor use remains to be solved and made waterproof.
 
 Raspberry PI 3+ (and 4) are old by now and I would recommend investing in a Raspberry 5 that will allow updating the database to a more updated version. 
+
+In a future release I will focus on battary savings actions and also include a solar cell charger for the power pack the will be used to power the sensors. The only battery saving actions that are implemented is that i turn WiFi on and of when there is adata to e sent to the MQTT broker. WiFi is by far the device that draw most power. Estitmated time period to measure in the real life would be in the timespan of 60-120 minutes.
 
 # Acknowledgements
 I want to thank my teacher and TA:s from the course for their guidance and support throughout this project.
