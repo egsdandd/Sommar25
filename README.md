@@ -227,55 +227,80 @@ Down below is the main loop that runs indefinitely. I think the code is pretty s
 # THE MAIN LOOP
     while True:
         try:
-            ADC_temperature, ADC_calibrated_temperature, ADC_voltage = read_calibrated_temperature()
+            ADC_temperature, ADC_calibrated_temperature, ADC_voltage = read_calibrated_temperature() # Read and calibrate temperature from ADC
+            if ADC_temperature is None or ADC_calibrated_temperature is None:
+                Log("Failed to read temperature from ADC", "ERROR")
+                continue  # Skip to the next iteration if reading fails
 
-            temperature, humidity = read_DHT22()
+            print("ADC calibrated Temperature:", ADC_calibrated_temperature, "°C") 
 
-            moist = plant_Monitor(sensorVCC,[soil_Sensor1,soil_Sensor2]) 
-            plant_Left_Moist_Level = moist[0]
-            plant_Right_Moist_Level = moist[1]
+            temperature, humidity = read_DHT22() # Read temperature and humidity from DHT22 sensor
 
+            moist = plant_Monitor(sensorVCC,[soil_Sensor1,soil_Sensor2]) # Read soil moisture levels for both plants
+            if moist is None or len(moist) < 2:
+                Log("Failed to read moisture levels from sensors", "ERROR")
+                continue
+            plant_Left_Moist_Level = moist[0] # Get moisture level for left plant
+            plant_Right_Moist_Level = moist[1] # Get moisture level for right plant
             print("Plant Left Moisture Level:", plant_Left_Moist_Level, "%")
             print("Plant Right Moisture Level:", plant_Right_Moist_Level, "%")
-            plants =[
-                ["left",plant_Right_Moist_Level,50],
-                ["right",plant_Left_Moist_Level,50]
-            ] 
-        except Exception as e:
+
+        except Exception as e: # Handle any exceptions that occur during sensor reading
             print("Sensor read failed:", e)
-            time.sleep(300)
+            
+            time.sleep(300) # Wait for 5 minutes before retrying
             continue
         try:
-            FlashLed(2)  # Flash LED to indicate data read
+            connect_wifi()  # Connect to Wi-Fi
+            time.sleep(1)  # Wait for Wi-Fi to stabilize
+            if not is_connected():  # Check if Wi-Fi is connected
+                Log("Not connected to Wi-Fi...connecting", "INFO")
+                print("Connecting to Wi-Fi...")
+                connect_wifi()  # Connect to Wi-Fi
 
+    
+            FlashLed(2)  # Flash LED to indicate data read
+            #Buzzer(1)
+            # Publish data to MQTT broker
             client.publish("egsdand/feeds/picow_temp", str(temperature))
             client.publish("egsdand/feeds/picow_hum", str(humidity))
+
             client.publish("egsdand/feeds/moisture1", str(plant_Left_Moist_Level))
             client.publish("egsdand/feeds/moisture2", str(plant_Right_Moist_Level))
+
             client.publish("egsdand/feeds/adc_calibrated_temp", str(ADC_calibrated_temperature))
+
             print("Data published successfully")
-        except Exception as e:
-            print("Publish failed:", e)
-        time.sleep(10)
-```
+            # Buzzer(2)
+            disconnect_wifi() # Disconnect from WIFI
+
+        except Exception as e: # Handle any exceptions that occur during MQTT publishing
+            print("MQTT publish failed:", e)
+            Log(f"MQTT publish failed: {e}", "ERROR")
+
+        time.sleep(120) # Wait for 2 minutes before the next iteration
+        # Free up memory
+        gc.collect()  # Collect garbage to free up memory```
 
 # Transmitting the data / connectivity
 
-Down below is a graph that describes how the whole project is connected together. The data from the DHT11 sensor is sent over a proprietary protocol managed by the DHT11 library using a physical wire. The soil sensors works the same way. The Pico sends the environment data every 60 seconds over WIFI using the MQTT protocol to the brooker. The router forwards the message from the Pico to the Raspberry Pi where the Mosquito MQTT broker listens on that port. The data then takes this path:
+Down below is a graph that describes how the whole project is connected together. The data from the DHT11 sensor is sent over a proprietary protocol managed by the DHT11 library using a physical wire. The soil sensors works the same way. The Pico sends the environment data every 120 seconds over WIFI using the MQTT protocol to the brooker. The router forwards the message from the Pico to the Raspberry Pi where the Mosquito MQTT broker listens on that port. The data then takes this path:
 
-Sensors --> Pico --> MQTT-broker Docker hosted on the Pi --> Node-Red (hosted on the Pi) --> MongoDb (Docker host) --> Node-Red-Dashboard
+Sensors --> Pico --> MQTT-broker (Docker hosted on the Pi) --> Node-Red (hosted on the Pi) --> MongoDb (Docker host) --> Node-Red-Dashboard
 
-Node-red pushes the data to the MongoDB Database and Node-Red-Dashboard to view the diagrams. The Node-Red-Dashboard reads long time data from Mong and displays it in a separate chart.
+Node-red pushes the data to the MongoDB Database and Node-Red-Dashboard to view the diagrams. The Node-Red-Dashboard reads long time data from MongoDB and displays it in a separate chart.
 
 # Presenting the data
 
 The data is visualized with a dashboard in [Node-Red](https://nodered.org/). My dashboard consists of two sections. One for the real time data - showing the temperature and humidity right now and the status of the 2 soil meters. The other section shows the data over time.
 
-The data is sent to the database every hour. I did a rough calculations and the amount of storage space the data will take up. In my lifetime it will never succeed 4 GB. So, the data is stored forever.
+The data is sent to the database after every read from the sensors. I did a rough calculations and the amount of storage space the data will take up. In my lifetime it will never succeed the capacity of my Pi GB. So, the data is stored forever.
+
+The long time data is updated with the help of a node-red inject node that trigger a read of the last record from the database.
 
 ![figure4](https://github.com/egsdandd/Sommar25/blob/main/img/jord.png)
 
-*Figure 4: The dashboard in Node-Red*
+*Figure 4: The dashboard in Node-Red for the soil sensors*
 
 # Finalizing the design
 
