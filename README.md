@@ -49,7 +49,7 @@ This tutorial walks through the steps of making a simple IoT-device that can mon
 
 The inspiration for this project came to me as a result of spending most of my summer at our summer house and then leaving our home unattended. I do have a watering system in place that runs on a schedule and I am also monitoring the waterflow in case ther should be a problem with the piping. However living in Sweden close to the coast you can never predict how much rain that will fall locally. I then decided to measure the humidity around the plants and based on that change the watering schedule. I also included a device to measure the air temperature and humidity and also the actual temperature of the device itself since it will be installed in some kind of box.
 
-![figure1](https://github.com/egsdandd/Sommar25/blob/main/img/utebild.jpg)
+![](img/utebild.jpg)
 *Figure 1: The outdoor plants*
 
 Hopefully this data helps me understand how much water my plants get and adjust the watering schedule accordingly. I also wanted to make a device that is easy to build and can be used in other projects. The device is built around a Raspberry Pi Pico W microcontroller which has built in WIFI and Bluetooth. The code is written in MicroPython and the data is sent over MQTT to a self-hosted MQTT broker on my home network. The data is then stored in an MongoDB database and visualized with Node-RED.
@@ -145,7 +145,7 @@ When everything set you are good to upload the code to the Pico.
 
 # Putting everything together
 
-![figure2](https://github.com/egsdandd/Sommar25/blob/main/img/ritning.jpg)
+![](img/ritning.jpg)
 *Figure 2: Connecting*
 
 The whole device can be split in 4 parts: The **Pico**, the **soil hygrometer**, the **temperature and humidity sensor** and the **buzzer**. I am not going to provide a diagram that shows you exactly where to put things on the breadboard; as it would be too messy. 
@@ -208,7 +208,7 @@ The code on the Pico is very simple. Half of the lines in the [*main.py*] file i
 I have divided my code in smaller modules according to this:
 
 
-![figure3](https://github.com/egsdandd/Sommar25/blob/main/img/github.png)
+![](img/github.png)
 
 *Figure 3: Github*
 
@@ -298,12 +298,12 @@ The data is sent to the database after every read from the sensors. I did a roug
 
 The long time data is updated with the help of a node-red inject node that trigger a read of the last record from the database.
 
-![figure4](https://github.com/egsdandd/Sommar25/blob/main/img/jord.png)
+![](img/jord.png)
 
 *Figure 4: The dashboard in Node-Red for the soil sensors*
 
 
-![figure5](https://github.com/egsdandd/Sommar25/blob/main/img/dubbla.jpg)
+![](img/dubbla.jpg)
 
 *Figure 5: The dashboard in Node-Red for the DHT11 and Pico internal sensor*
 
