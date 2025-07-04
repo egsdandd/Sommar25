@@ -280,7 +280,8 @@ Down below is the main loop that runs indefinitely. I think the code is pretty s
 
         time.sleep(120) # Wait for 2 minutes before the next iteration
         # Free up memory
-        gc.collect()  # Collect garbage to free up memory```
+        gc.collect()  # Collect garbage to free up memory
+```
 
 # Transmitting the data / connectivity
 
