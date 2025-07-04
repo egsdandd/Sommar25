@@ -302,9 +302,10 @@ The long time data is updated with the help of a node-red inject node that trigg
 
 *Figure 4: The dashboard in Node-Red for the soil sensors*
 
-![figure4](https://github.com/egsdandd/Sommar25/blob/main/img/dubbla.png)
 
-*Figure 4: The dashboard in Node-Red for the DHT11 and Pico internal sensor*
+![figure5](https://github.com/egsdandd/Sommar25/blob/main/img/dubbla.png)
+
+*Figure 5: The dashboard in Node-Red for the DHT11 and Pico internal sensor*
 # Finalizing the design
 
 Thinking back on the project it went very well after becomming familiar with the Pico pin-out. I had some trouble making the moister sensors work at first but after some debbuging it was working fine.
