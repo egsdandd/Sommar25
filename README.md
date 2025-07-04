@@ -303,7 +303,7 @@ The long time data is updated with the help of a node-red inject node that trigg
 *Figure 4: The dashboard in Node-Red for the soil sensors*
 
 
-![figure5](https://github.com/egsdandd/Sommar25/blob/main/img/dubbla.png)
+![figure5](https://github.com/egsdandd/Sommar25/blob/main/img/dubbla.jpg)
 
 *Figure 5: The dashboard in Node-Red for the DHT11 and Pico internal sensor*
 
