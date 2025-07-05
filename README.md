@@ -318,6 +318,10 @@ Raspberry PI 3+ (and 4) are old by now and I would recommend investing in a Rasp
 
 In a future release I will focus on battary savings actions and also include a solar cell charger for the power pack the will be used to power the sensors. The only battery saving actions that are implemented is that i turn WiFi on and of when there is adata to e sent to the MQTT broker. WiFi is by far the device that draw most power. Estitmated time period to measure in the real life would be in the timespan of 60-120 minutes.
 
+![](img/setup.jpg)
+
+*Figure 6: The lab setup with 2 different soil glasses*
+
 # Acknowledgements
 I want to thank my teacher and TA:s from the course for their guidance and support throughout this project.
 # License
