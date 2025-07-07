@@ -146,7 +146,17 @@ When everything set you are good to upload the code to the Pico.
 # Putting everything together
 
 ![](img/ritning.jpg)
-*Figure 2: Connecting*
+*Figure 2A: Connecting*
+
+### Power calculations ###
+
+The actual power consumption of the device can be regarded as close to zero as long as the WiFi is disconected. My readings gave 0.00A during sleep and then when WiFi is connected it was 0.06A. Conclousions are that it is only the WiFi devices that will affect the power consumption. Checking with the documentation confirmed this.
+
+![](img/000A.jpg)
+*Figure 2B: Power consumption - No WiFi Connected*
+
+![](img/006A.jpg)
+*Figure 2C: Power consumption - with WiFi Connected*
 
 The whole device can be split in 4 parts: The **Pico**, the **soil hygrometer**, the **temperature and humidity sensor** and the **buzzer**. I am not going to provide a diagram that shows you exactly where to put things on the breadboard; as it would be too messy. 
 
