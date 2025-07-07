@@ -114,7 +114,7 @@ Press the SHIFT-CTRL-P and search for MicroPico connect. Click on it and you sho
 ### Step 3: uploading the code to the Pico
 Well done! We are now ready to upload the code to the Pico. I recommend you to play around with your Pico and try to write your own code and upload it. Then download the code with the MicroPico extension.
 
-When you are feeling confident in writing code to the Pico, clone the GitHub repository to your computer and open the folder in VS Code.
+When you are feeling confident in writing code to the Pico, clone the GitHub repository to your computer and open the folder in VS Code. Select the files to upload to Pico - right click" and select "Upload to Pico". The you can press run on first boot.py and then main.py. Boot.py can be edited to start main directly if You prefer that.
 
 #### Variables in the code
 
