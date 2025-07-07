@@ -201,7 +201,7 @@ There are many others to choose from and another example is [this](https://learn
 I choosed to install my own on my Raspberry Pi as it is good learning experience. The stack consist of:
 
 * [Mosquitto](https://mosquitto.org/) (Docker based MQTT Broker - eclipse-mosquitto )
-* [MongoDB ](https://www.mongodb.com/) (Docker based Database - mongodb/mongodb-community-server:4.4.3-ubuntu2004, this is an old version that is EOL but worked for me )
+* [MongoDB ](https://www.mongodb.com/) (Docker based Database - mongodb/mongodb-community-server:4.4.3-ubuntu2004, this is an old version that is EOL but worked for me ). I had experience with MongoDB from other projects and it worked fine even then.
 * [Node-red](https://nodered.org/) (programming tool for connecting devices. In this case the MQTT Broker with the MongoDB Database). This I installed plain even though it is available as a docker image.
 * [Node-red-desktop](https://nodered.org/)  (For visualizing the data I use rev 2.0.0 of the dashboard)
 
@@ -295,9 +295,13 @@ Down below is the main loop that runs indefinitely. I think the code is pretty s
 
 # Transmitting the data / connectivity
 
-Down below is a graph that describes how the whole project is connected together. The data from the DHT11 sensor is sent over a proprietary protocol managed by the DHT11 library using a physical wire. The soil sensors works the same way. The Pico sends the environment data every 120 seconds over WIFI using the MQTT protocol to the brooker. The router forwards the message from the Pico to the Raspberry Pi where the Mosquito MQTT broker listens on that port. The data then takes this path:
+Down below is a graph that describes how the whole project is connected together. The data from the DHT11 sensor is sent over a proprietary protocol managed by the DHT11 library using a physical wire. The soil sensors works the same way. The Pico sends the environment data every 120 seconds over WiFi using the MQTT protocol to the brooker. The router forwards the message from the Pico to the Raspberry Pi where the Mosquito MQTT broker listens on that port. 
 
-Sensors --> Pico --> MQTT-broker (Docker hosted on the Pi) --> Node-Red (hosted on the Pi) --> MongoDb (Docker host) --> Node-Red-Dashboard
+The choise of WiFi was simple since I have coverage outside my house where an WiFi AP is located close nearby.
+
+The data then takes this path:
+
+Sensors --> Pico --> WiFi --> MQTT-broker (Docker hosted on the Pi) --> Node-Red (hosted on the Pi) --> MongoDb (Docker host) --> Node-Red-Dashboard --> Web-page
 
 Node-red pushes the data to the MongoDB Database and Node-Red-Dashboard to view the diagrams. The Node-Red-Dashboard reads long time data from MongoDB and displays it in a separate chart.
 
