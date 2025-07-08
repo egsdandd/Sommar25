@@ -80,26 +80,26 @@ def Buzzer(noOfTimes):
 Log("Starting up...", "INFO")
 Buzzer(1) # Beep once to indicate startup
 
-# DHT22-sensor
+# DHT11-sensor
 
-def read_DHT22():
+def read_DHT11():
     try:
         dht_sensor.measure()  # Measure temperature and humidity
-        time.sleep(2)         # DHT22 requires a 2-second delay to stabilize after power-up
+        time.sleep(2)         # DHT11 requires a 2-second delay to stabilize after power-up
         temperature = dht_sensor.temperature()  # Gets temperature in Celsius
         if temperature is None: 
-            Log("Failed to read temperature from DHT22", "ERROR") # If temperature reading fails, log an error
+            Log("Failed to read temperature from DHT11", "ERROR") # If temperature reading fails, log an error
             return None, None
         humidity = dht_sensor.humidity()        # Gets humidity in percentage
         if humidity < 0 or humidity > 100:  # Check if humidity is within valid range
             Log("Humidity reading out of range (0-100%)", "ERROR") # If humidity is out of range, log an error
             return None, None
         if humidity is None: # If humidity reading fails, log an error
-            Log("Failed to read humidity from DHT22", "ERROR") # If humidity reading fails, log an error
+            Log("Failed to read humidity from DHT11", "ERROR") # If humidity reading fails, log an error
             return None, None
         return temperature, humidity
     except Exception as e:
-        Log(f"Exception occurred while reading DHT22: {e}", "ERROR")
+        Log(f"Exception occurred while reading DHT11: {e}", "ERROR")
         return None, None
 
 
@@ -200,7 +200,7 @@ def main():
 
             print("ADC calibrated Temperature:", ADC_calibrated_temperature, "°C") 
 
-            temperature, humidity = read_DHT22() # Read temperature and humidity from DHT22 sensor
+            temperature, humidity = read_DHT11() # Read temperature and humidity from DHT11 sensor
 
             moist = plant_Monitor(sensorVCC,[soil_Sensor1,soil_Sensor2]) # Read soil moisture levels for both plants
             if moist is None or len(moist) < 2:
