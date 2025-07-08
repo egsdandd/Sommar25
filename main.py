@@ -121,7 +121,7 @@ def outlier_Deleter(value_Array):
     filtered_array = list(filter(lambda x:lower_Bound<=x<=upper_Bound,value_Array)) # Filter the array to remove outliers
     return filtered_array
 
-def moisture_Precent(curr_Val):  
+def moisture_Percent(curr_Val):  
     dry_Soil_Value = 65535 # Max value, Wet soil
     wet_Soil_Value = 0 # Min value, Desert 
     percent = (curr_Val - dry_Soil_Value) * (100) / (wet_Soil_Value - dry_Soil_Value) # Calculate the percentage of moisture
@@ -137,14 +137,14 @@ def read_Sensor_Average(samples, plant_Reader, plantVCC): # Read soil sensors an
         time.sleep(0.005) # Wait for sensors to stabilize
         single_Mesure_Array = [] # Array to hold single measurements for each plant
         for sensor in plant_Reader: # Loop over all plants
-            single_Mesure_Array.append(sensor.read_u16()) # Create array [Value plant1, Value plant2,...]
+            single_Mesure_Array.append(sensor.read_u16()) # Create array and read the senor [Value plant1, Value plant2,...]
         # print("Single measurement array:", single_Mesure_Array) # Print the single measurement array
         total.append(single_Mesure_Array) # Create array [[Value plant1, Value plant2,...],[Value plant1, Value plant2,...]]
         plantVCC.value(0)  # Turn off VCC for soil sensors
         time.sleep(0.005)
     for i in range(len(plant_Reader)):# Loop over the number of plants 
         clean_Value_array = outlier_Deleter([row[i] for row in total]) # Take out the values associate with the plant and clean the array from outliers
-        moisture = moisture_Precent(sum(clean_Value_array) / len(clean_Value_array)) # Send the average value of the raw values to calculate the precentage between 0-100
+        moisture = moisture_Percent(sum(clean_Value_array) / len(clean_Value_array)) # Send the average value of the raw values to calculate the precentage between 0-100
         return_Array.append(moisture) # Append mosture level to retrun array [Moist_Level_Plant_1, Moist_Level_Plant_2,...]
     gc.collect()  # Delete nonsense data, Keep memory free!
     return return_Array
