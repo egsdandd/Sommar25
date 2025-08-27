@@ -201,6 +201,8 @@ def main():
             print("ADC calibrated Temperature:", ADC_calibrated_temperature, "°C") 
 
             temperature, humidity = read_DHT11() # Read temperature and humidity from DHT11 sensor
+            print("Temperature:", temperature, "°C")
+            print("Humidity:", humidity, "%")
 
             moist = plant_Monitor(sensorVCC,[soil_Sensor1,soil_Sensor2]) # Read soil moisture levels for both plants
             if moist is None or len(moist) < 2:
